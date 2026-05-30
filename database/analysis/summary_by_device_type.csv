@@ -1,0 +1,7 @@
+Device_Type,record_count,avg_clean_maintenance_cost,avg_downtime_hours,avg_failure_event_count,urgent_class_count,high_failure_count_ge_4
+CT Scanner,662,9011.82,10.34,1.91,225,91
+Defibrillator,701,9005.71,10.66,2.03,232,102
+Infusion Pump,705,8721.93,10.62,2.00,217,104
+MRI Scanner,673,8837.82,10.46,1.93,217,78
+PET Scanner,679,9062.52,11.04,1.93,234,96
+X-Ray Machine,729,8791.34,10.60,1.94,258,106

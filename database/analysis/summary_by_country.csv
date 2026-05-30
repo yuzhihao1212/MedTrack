@@ -1,0 +1,7 @@
+Country,record_count,avg_clean_maintenance_cost,avg_downtime_hours,avg_failure_event_count,urgent_class_count,high_failure_count_ge_4
+Canada,736,8642.94,10.59,1.94,240,98
+France,669,8944.55,10.68,1.92,221,94
+Italy,704,8935.76,10.32,1.96,239,103
+Japan,704,9179.37,10.78,1.97,255,100
+UK,694,8551.22,10.55,1.95,213,89
+USA,642,9203.87,10.84,2.01,215,93

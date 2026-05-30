@@ -1,0 +1,6 @@
+issue,count,recommendation
+Missing values,0,No missing values detected in the uploaded dataset.
+Duplicate Device_ID,0,Device_ID is unique and can be used as a natural device code.
+Negative maintenance cost,105,Treat as data anomaly. Keep raw value but use NULL/blank in cleaned cost for SQL seed data.
+Invalid purchase date,0,No invalid dates detected. Purchase_Date format is YYYY-MM-DD.
+Outlier maintenance cost,12,Review values above 30000 as high-cost outliers. They may be useful for analytics rather than removed.

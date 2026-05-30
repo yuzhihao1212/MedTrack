@@ -1,0 +1,7 @@
+Manufacturer,record_count,avg_clean_maintenance_cost,avg_downtime_hours,avg_failure_event_count,urgent_class_count,high_failure_count_ge_4
+CardioSync,677,8810.79,10.70,1.88,220,86
+ImagingTech,698,8981.29,10.69,1.98,237,97
+MedEquip,691,8658.38,10.64,2.01,235,100
+RescueTech,689,8941.89,10.65,1.96,232,94
+ScanPro,729,8921.92,10.49,1.91,235,114
+UltraMed,665,9106.29,10.57,2.02,224,86

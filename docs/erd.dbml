@@ -1,0 +1,77 @@
+Table manufacturers {
+  manufacturer_id int [pk, increment]
+  manufacturer_name varchar(100) [not null, unique]
+  country varchar(100)
+}
+
+Table device_types {
+  device_type_id int [pk, increment]
+  type_name varchar(100) [not null, unique]
+  risk_category varchar(50)
+}
+
+Table devices {
+  device_id int [pk, increment]
+  device_code varchar(50) [not null, unique]
+  device_type_id int [not null]
+  manufacturer_id int [not null]
+  model varchar(100)
+  purchase_date date
+  age_years int
+  risk_status varchar(30)
+}
+
+Table failure_reports {
+  failure_id int [pk, increment]
+  device_id int [not null]
+  failure_event_count int
+  downtime_hours decimal(10,2)
+  severity varchar(30)
+  report_status varchar(30)
+}
+
+Table technicians {
+  technician_id int [pk, increment]
+  full_name varchar(120) [not null]
+  email varchar(150) [unique]
+  specialisation varchar(100)
+}
+
+Table maintenance_records {
+  maintenance_id int [pk, increment]
+  device_id int [not null]
+  technician_id int
+  maintenance_frequency int
+  maintenance_class int
+  maintenance_priority varchar(50)
+  maintenance_cost decimal(10,2)
+  repair_status varchar(30)
+}
+
+Table users {
+  user_id int [pk, increment]
+  username varchar(100) [not null, unique]
+  password_hash varchar(255) [not null]
+  role varchar(30) [not null]
+}
+
+Table parts {
+  part_id int [pk, increment]
+  part_name varchar(120) [not null]
+  unit_cost decimal(10,2)
+  stock_quantity int
+}
+
+Table maintenance_parts {
+  maintenance_id int [not null]
+  part_id int [not null]
+  quantity_used int [not null]
+}
+
+Ref: devices.device_type_id > device_types.device_type_id
+Ref: devices.manufacturer_id > manufacturers.manufacturer_id
+Ref: failure_reports.device_id > devices.device_id
+Ref: maintenance_records.device_id > devices.device_id
+Ref: maintenance_records.technician_id > technicians.technician_id
+Ref: maintenance_parts.maintenance_id > maintenance_records.maintenance_id
+Ref: maintenance_parts.part_id > parts.part_id

@@ -1,6 +1,7 @@
 {
   "name": "medtrack-backend",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "Express backend for MedTrack dashboard",
   "main": "server.js",
   "scripts": {
@@ -14,5 +15,22 @@
     "express": "^4.19.2",
     "mongodb": "^6.8.0",
     "mysql2": "^3.11.3"
+=======
+  "description": "MedTrack – Medical Device Tracking System Backend (MySQL + MongoDB)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev":   "nodemon server.js"
+  },
+  "dependencies": {
+    "cors":         "^2.8.5",
+    "dotenv":       "^16.4.5",
+    "express":      "^4.19.2",
+    "mongodb":      "^6.7.0",
+    "mysql2":       "^3.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+>>>>>>> 4b8c25f0aba67127ad7624ffabd299d10cdde934
   }
 }

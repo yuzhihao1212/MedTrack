@@ -1,35 +1,33 @@
 const { MongoClient } = require("mongodb");
 
-const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
-const mongoDbName = process.env.MONGO_DB_NAME || "medtrack_nosql";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017";
+const DB_NAME   = process.env.MONGO_DB   || "medtrack_nosql";
 
-const client = new MongoClient(mongoUri);
+let db = null;
 
-let database;
+/**
+ * Connect to MongoDB and cache the db handle.
+ * Call this once at server startup.
+ */
+async function connectMongoDB() {
+  if (db) return db;
 
-async function connectMongo() {
-  if (!database) {
-    await client.connect();
-    database = client.db(mongoDbName);
+  const client = new MongoClient(MONGO_URI);
+  await client.connect();
+  db = client.db(DB_NAME);
+  console.log(`[MongoDB] Connected to database: ${DB_NAME}`);
+  return db;
+}
+
+/**
+ * Return the cached db handle.
+ * Throws if connectMongoDB() has not been called yet.
+ */
+function getDB() {
+  if (!db) {
+    throw new Error("MongoDB not connected. Call connectMongoDB() first.");
   }
-  return database;
+  return db;
 }
 
-async function testMongoConnection() {
-  // ping the database so startup fails fast on connection issues
-  const db = await connectMongo();
-  await db.command({ ping: 1 });
-}
-
-function getMongoDb() {
-  if (!database) {
-    throw new Error("MongoDB is not connected yet!");
-  }
-  return database;
-}
-
-module.exports = {
-  connectMongo,
-  testMongoConnection,
-  getMongoDb
-};
+module.exports = { connectMongoDB, getDB };

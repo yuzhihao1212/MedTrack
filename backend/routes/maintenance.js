@@ -1,8 +1,9 @@
 const express = require("express");
-const { pool } = require("../config/mysql");
+const pool = require("../config/mysql");
 
 const router = express.Router();
 
+// fetch one maintenance record with technician lookup
 async function fetchMaintenanceById(connection, maintenanceId) {
   const [rows] = await connection.query(
     `SELECT
@@ -27,6 +28,7 @@ async function fetchMaintenanceById(connection, maintenanceId) {
   return rows[0] || null;
 }
 
+// GET /api/maintenance
 // maintenance list
 router.get("/", async (req, res) => {
   try {
@@ -58,6 +60,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/dashboard
+// maintenance dashboard view
 router.get("/dashboard", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -73,6 +77,7 @@ router.get("/dashboard", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/cost-by-manufacturer
 // cost by manufacturer
 router.get("/cost-by-manufacturer", async (req, res) => {
   try {
@@ -98,6 +103,7 @@ router.get("/cost-by-manufacturer", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/workload
 // technician workload
 router.get("/workload", async (req, res) => {
   try {
@@ -123,6 +129,8 @@ router.get("/workload", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/technicians
+// technician lookup
 router.get("/technicians", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -141,6 +149,8 @@ router.get("/technicians", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/parts
+// part lookup
 router.get("/parts", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -159,6 +169,7 @@ router.get("/parts", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/pending
 // pending maintenance
 router.get("/pending", async (req, res) => {
   try {
@@ -187,6 +198,7 @@ router.get("/pending", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/parts-usage
 // parts usage summary
 router.get("/parts-usage", async (req, res) => {
   try {
@@ -212,7 +224,8 @@ router.get("/parts-usage", async (req, res) => {
   }
 });
 
-// record parts
+// GET /api/maintenance/:id/parts
+// maintenance parts by maintenance id
 router.get("/:id/parts", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -239,6 +252,7 @@ router.get("/:id/parts", async (req, res) => {
   }
 });
 
+// GET /api/maintenance/:id
 // single maintenance lookup
 router.get("/:id", async (req, res) => {
   try {
@@ -252,6 +266,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// POST /api/maintenance
 // create maintenance record
 router.post("/", async (req, res) => {
   const {
@@ -287,6 +302,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// PUT /api/maintenance/:id
 // update maintenance record
 router.put("/:id", async (req, res) => {
   try {
@@ -338,6 +354,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// PATCH /api/maintenance/:id/status
 // update maintenance status
 router.patch("/:id/status", async (req, res) => {
   const { repair_status } = req.body;
@@ -362,17 +379,28 @@ router.patch("/:id/status", async (req, res) => {
   }
 });
 
-// add record part
+// POST /api/maintenance/:id/parts
+// add maintenance part
 router.post("/:id/parts", async (req, res) => {
   const maintenanceId = req.params.id;
   const { part_id, quantity_used = 1 } = req.body;
 
   if (!part_id) {
-    return res.status(400).json({ success: false, message: "part_id is required" });
+    return res.status(400).json({
+      success: false,
+      message: "part_id is required"
+    });
+  }
+
+  if (quantity_used <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "quantity_used must be greater than 0"
+    });
   }
 
   try {
-    const [result] = await pool.query(
+    await pool.query(
       `INSERT INTO maintenance_parts (maintenance_id, part_id, quantity_used)
        VALUES (?, ?, ?)`,
       [maintenanceId, part_id, quantity_used]
@@ -381,19 +409,35 @@ router.post("/:id/parts", async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Maintenance part added",
-      data: { maintenance_id: maintenanceId, part_id, quantity_used }
+      data: {
+        maintenance_id: Number(maintenanceId),
+        part_id: Number(part_id),
+        quantity_used: Number(quantity_used)
+      }
     });
   } catch (error) {
-    const status = error.code === "ER_DUP_ENTRY" ? 409 : 500;
+    const status =
+      error.code === "ER_DUP_ENTRY" ? 409 :
+      error.code === "ER_NO_REFERENCED_ROW_2" ? 400 :
+      500;
+
+    const message =
+      error.code === "ER_DUP_ENTRY"
+        ? "This part is already linked to the maintenance record"
+        : error.code === "ER_NO_REFERENCED_ROW_2"
+          ? "Invalid maintenance_id or part_id"
+          : "Failed to add maintenance part";
+
     res.status(status).json({
       success: false,
-      message: "Failed to add maintenance part",
+      message,
       error: error.message
     });
   }
 });
 
-// update record part
+// PUT /api/maintenance/:maintenanceId/parts/:partId
+// update maintenance part
 router.put("/:maintenanceId/parts/:partId", async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const { quantity_used = 1 } = req.body;
@@ -424,6 +468,7 @@ router.put("/:maintenanceId/parts/:partId", async (req, res) => {
   }
 });
 
+// DELETE /api/maintenance/:id
 // delete maintenance record and dependencies
 router.delete("/:id", async (req, res) => {
   const connection = await pool.getConnection();
@@ -449,7 +494,8 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// delete parts
+// DELETE /api/maintenance/:maintenanceId/parts/:partId
+// delete maintenance part
 router.delete("/:maintenanceId/parts/:partId", async (req, res) => {
   const { maintenanceId, partId } = req.params;
 

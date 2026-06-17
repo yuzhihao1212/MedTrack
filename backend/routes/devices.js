@@ -1,8 +1,9 @@
 const express = require("express");
-const { pool } = require("../config/mysql");
+const pool = require("../config/mysql");
 
 const router = express.Router();
 
+// fetch one device with lookup details
 async function fetchDeviceById(connection, deviceId) {
   const [rows] = await connection.query(
     `SELECT
@@ -29,6 +30,7 @@ async function fetchDeviceById(connection, deviceId) {
   return rows[0] || null;
 }
 
+// GET /api/devices
 // device list
 router.get("/", async (req, res) => {
   try {
@@ -63,6 +65,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/devices/high-risk
 // high-risk devices
 router.get("/high-risk", async (req, res) => {
   try {
@@ -90,6 +93,7 @@ router.get("/high-risk", async (req, res) => {
   }
 });
 
+// GET /api/devices/manufacturers
 // manufacturer lookup
 router.get("/manufacturers", async (req, res) => {
   try {
@@ -109,6 +113,7 @@ router.get("/manufacturers", async (req, res) => {
   }
 });
 
+// GET /api/devices/device-types
 // device type lookup
 router.get("/device-types", async (req, res) => {
   try {
@@ -128,6 +133,7 @@ router.get("/device-types", async (req, res) => {
   }
 });
 
+// GET /api/devices/:id
 // single device lookup
 router.get("/:id", async (req, res) => {
   try {
@@ -150,6 +156,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// POST /api/devices
 // create device
 router.post("/", async (req, res) => {
   const {
@@ -194,6 +201,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// PUT /api/devices/:id
 // update device
 router.put("/:id", async (req, res) => {
   try {
@@ -255,6 +263,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// DELETE /api/devices/:id
 // delete device and dependencies
 router.delete("/:id", async (req, res) => {
   const connection = await pool.getConnection();

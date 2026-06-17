@@ -1,9 +1,10 @@
 const express = require("express");
-const { pool } = require("../config/mysql");
+const pool = require("../config/mysql");
 
 const router = express.Router();
 
-// dashboard KPI endpoint
+// GET /api/dashboard
+// dashboard KPI summary
 router.get("/", async (req, res) => {
   try {
     const [rows] = await pool.query(

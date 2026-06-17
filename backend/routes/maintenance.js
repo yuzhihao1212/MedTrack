@@ -1,7 +1,17 @@
 const express = require("express");
 const pool = require("../config/mysql");
+const { success, created, badRequest, notFound, conflict, serverError } = require("../utils/apiResponse");
+const {
+  requireFields,
+  validatePositiveId,
+  validateField,
+  isNonNegativeNumber
+} = require("../utils/validation");
 
 const router = express.Router();
+// match values in sql script
+const MAINTENANCE_PRIORITIES = ["Low", "Medium", "High", "Critical"];
+const REPAIR_STATUSES = ["Pending", "In Progress", "Completed"];
 
 // fetch one maintenance record with technician lookup
 async function fetchMaintenanceById(connection, maintenanceId) {
@@ -50,13 +60,9 @@ router.get("/", async (req, res) => {
       LEFT JOIN technicians t ON t.technician_id = mr.technician_id
       ORDER BY mr.created_at DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load maintenance records",
-      error: error.message
-    });
+    serverError(res, "Failed to load maintenance records", error);
   }
 });
 
@@ -67,13 +73,9 @@ router.get("/dashboard", async (req, res) => {
     const [rows] = await pool.query(
       "SELECT * FROM maintenance_dashboard_view"
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load maintenance dashboard",
-      error: error.message
-    });
+    serverError(res, "Failed to load maintenance dashboard", error);
   }
 });
 
@@ -93,13 +95,9 @@ router.get("/cost-by-manufacturer", async (req, res) => {
       GROUP BY m.manufacturer_name
       ORDER BY total_maintenance_cost DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load maintenance cost by manufacturer",
-      error: error.message
-    });
+    serverError(res, "Failed to load maintenance cost by manufacturer", error);
   }
 });
 
@@ -119,13 +117,9 @@ router.get("/workload", async (req, res) => {
       GROUP BY t.technician_id, t.full_name, t.specialisation
       ORDER BY assigned_jobs DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load technician workload",
-      error: error.message
-    });
+    serverError(res, "Failed to load technician workload", error);
   }
 });
 
@@ -139,13 +133,9 @@ router.get("/technicians", async (req, res) => {
        ORDER BY full_name ASC`
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load technicians",
-      error: error.message
-    });
+    serverError(res, "Failed to load technicians", error);
   }
 });
 
@@ -159,13 +149,9 @@ router.get("/parts", async (req, res) => {
        ORDER BY part_name ASC`
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load parts",
-      error: error.message
-    });
+    serverError(res, "Failed to load parts", error);
   }
 });
 
@@ -188,13 +174,9 @@ router.get("/pending", async (req, res) => {
         FIELD(mr.maintenance_priority, 'Critical', 'High', 'Medium', 'Low'),
         mr.maintenance_cost DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load pending maintenance",
-      error: error.message
-    });
+    serverError(res, "Failed to load pending maintenance", error);
   }
 });
 
@@ -214,13 +196,9 @@ router.get("/parts-usage", async (req, res) => {
       GROUP BY p.part_id, p.part_name, p.stock_quantity, p.unit_cost
       ORDER BY total_quantity_used DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load parts usage summary",
-      error: error.message
-    });
+    serverError(res, "Failed to load parts usage summary", error);
   }
 });
 
@@ -228,6 +206,10 @@ router.get("/parts-usage", async (req, res) => {
 // maintenance parts by maintenance id
 router.get("/:id/parts", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "maintenance_id");
+    if (idError) {
+      return badRequest(res, idError);
+    }
     const [rows] = await pool.query(
       `SELECT
         mp.maintenance_id,
@@ -242,13 +224,9 @@ router.get("/:id/parts", async (req, res) => {
       [req.params.id]
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load maintenance parts",
-      error: error.message
-    });
+    serverError(res, "Failed to load maintenance parts", error);
   }
 });
 
@@ -256,13 +234,18 @@ router.get("/:id/parts", async (req, res) => {
 // single maintenance lookup
 router.get("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "maintenance_id");
+
+    if (idError) {
+      return badRequest(res, idError);
+    }
     const record = await fetchMaintenanceById(pool, req.params.id);
     if (!record) {
-      return res.status(404).json({ success: false, message: "Maintenance record not found" });
+      return notFound(res, "Maintenance record not found");
     }
-    res.json({ success: true, data: record });
+    success(res, record);
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to load maintenance record", error: error.message });
+    serverError(res, "Failed to load maintenance record", error);
   }
 });
 
@@ -279,8 +262,41 @@ router.post("/", async (req, res) => {
     repair_status = "Pending"
   } = req.body;
 
-  if (!device_id) {
-    return res.status(400).json({ success: false, message: "device_id is required" });
+  const missing = requireFields(req.body, ["device_id"]);
+
+  if (missing) {
+    return badRequest(res, missing);
+  }
+
+  let validationError = validatePositiveId(device_id, "device_id");
+
+  if (validationError) {
+    return badRequest(res, validationError);
+  }
+
+  if (technician_id !== null) {
+    validationError = validatePositiveId(technician_id, "technician_id");
+    if (validationError) return badRequest(res, validationError);
+  }
+
+  if (maintenance_frequency !== null && !isNonNegativeNumber(maintenance_frequency)) {
+    return badRequest(res, "maintenance_frequency must be a non-negative number");
+  }
+
+  if (maintenance_class !== null && !isNonNegativeNumber(maintenance_class)) {
+    return badRequest(res, "maintenance_class must be a non-negative number");
+  }
+
+  if (maintenance_cost !== null && !isNonNegativeNumber(maintenance_cost)) {
+    return badRequest(res, "maintenance_cost must be a non-negative number");
+  }
+
+  validationError =
+    validateField(maintenance_priority, "maintenance_priority", MAINTENANCE_PRIORITIES) ||
+    validateField(repair_status, "repair_status", REPAIR_STATUSES);
+
+  if (validationError) {
+    return badRequest(res, validationError);
   }
 
   try {
@@ -292,13 +308,12 @@ router.post("/", async (req, res) => {
     );
 
     const record = await fetchMaintenanceById(pool, result.insertId);
-    res.status(201).json({ success: true, message: "Maintenance record created", data: record });
+    created(res, record, "Maintenance record created");
   } catch (error) {
-    res.status(error.code === "ER_NO_REFERENCED_ROW_2" ? 400 : 500).json({
-      success: false,
-      message: "Failed to create maintenance record",
-      error: error.message
-    });
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return badRequest(res, "Invalid device_id or technician_id", error.message);
+    }
+    serverError(res, "Failed to create maintenance record", error);
   }
 });
 
@@ -306,9 +321,46 @@ router.post("/", async (req, res) => {
 // update maintenance record
 router.put("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "maintenance_id");
+
+    if (idError) {
+      return badRequest(res, idError);
+    }
+
+    if (req.body.device_id !== undefined) {
+      const validationError = validatePositiveId(req.body.device_id, "device_id");
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.technician_id !== undefined && req.body.technician_id !== null) {
+      const validationError = validatePositiveId(req.body.technician_id, "technician_id");
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.maintenance_frequency !== undefined && req.body.maintenance_frequency !== null && !isNonNegativeNumber(req.body.maintenance_frequency)) {
+      return badRequest(res, "maintenance_frequency must be a non-negative number");
+    }
+
+    if (req.body.maintenance_class !== undefined && req.body.maintenance_class !== null && !isNonNegativeNumber(req.body.maintenance_class)) {
+      return badRequest(res, "maintenance_class must be a non-negative number");
+    }
+
+    if (req.body.maintenance_cost !== undefined && req.body.maintenance_cost !== null && !isNonNegativeNumber(req.body.maintenance_cost)) {
+      return badRequest(res, "maintenance_cost must be a non-negative number");
+    }
+
+    if (req.body.maintenance_priority !== undefined) {
+      const validationError = validateField(req.body.maintenance_priority, "maintenance_priority", MAINTENANCE_PRIORITIES);
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.repair_status !== undefined) {
+      const validationError = validateField(req.body.repair_status, "repair_status", REPAIR_STATUSES);
+      if (validationError) return badRequest(res, validationError);
+    }
     const existing = await fetchMaintenanceById(pool, req.params.id);
     if (!existing) {
-      return res.status(404).json({ success: false, message: "Maintenance record not found" });
+      return notFound(res, "Maintenance record not found");
     }
 
     const next = {
@@ -344,13 +396,13 @@ router.put("/:id", async (req, res) => {
     );
 
     const record = await fetchMaintenanceById(pool, req.params.id);
-    res.json({ success: true, message: "Maintenance record updated", data: record });
+    success(res, record, "Maintenance record updated");
   } catch (error) {
-    res.status(error.code === "ER_NO_REFERENCED_ROW_2" ? 400 : 500).json({
-      success: false,
-      message: "Failed to update maintenance record",
-      error: error.message
-    });
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return badRequest(res, "Invalid device_id or technician_id", error.message);
+    }
+
+    serverError(res, "Failed to update maintenance record", error);
   }
 });
 
@@ -358,8 +410,20 @@ router.put("/:id", async (req, res) => {
 // update maintenance status
 router.patch("/:id/status", async (req, res) => {
   const { repair_status } = req.body;
-  if (!repair_status) {
-    return res.status(400).json({ success: false, message: "repair_status is required" });
+  const idError = validatePositiveId(req.params.id, "maintenance_id");
+  if (idError) {
+    return badRequest(res, idError);
+  }
+  const missing = requireFields(req.body, ["repair_status"]);
+
+  if (missing) {
+    return badRequest(res, missing);
+  }
+
+  const validationError = validateField(repair_status, "repair_status", REPAIR_STATUSES);
+
+  if (validationError) {
+    return badRequest(res, validationError);
   }
 
   try {
@@ -369,13 +433,13 @@ router.patch("/:id/status", async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: "Maintenance record not found" });
+      return notFound(res, "Maintenance record not found");
     }
 
     const record = await fetchMaintenanceById(pool, req.params.id);
-    res.json({ success: true, message: "Maintenance status updated", data: record });
+    success(res, record, "Maintenance status updated");
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to update maintenance status", error: error.message });
+    serverError(res, "Failed to update maintenance status", error);
   }
 });
 
@@ -385,18 +449,28 @@ router.post("/:id/parts", async (req, res) => {
   const maintenanceId = req.params.id;
   const { part_id, quantity_used = 1 } = req.body;
 
-  if (!part_id) {
-    return res.status(400).json({
-      success: false,
-      message: "part_id is required"
-    });
+  const idError = validatePositiveId(maintenanceId, "maintenance_id");
+
+  if (idError) {
+    return badRequest(res, idError);
   }
 
-  if (quantity_used <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "quantity_used must be greater than 0"
-    });
+  const missing = requireFields(req.body, ["part_id"]);
+
+  if (missing) {
+    return badRequest(res, missing);
+  }
+
+  const partIdError = validatePositiveId(part_id, "part_id");
+
+  if (partIdError) {
+    return badRequest(res, partIdError);
+  }
+
+  const quantityError = validatePositiveId(quantity_used, "quantity_used");
+
+  if (quantityError) {
+    return badRequest(res, quantityError);
   }
 
   try {
@@ -406,33 +480,25 @@ router.post("/:id/parts", async (req, res) => {
       [maintenanceId, part_id, quantity_used]
     );
 
-    res.status(201).json({
-      success: true,
-      message: "Maintenance part added",
-      data: {
+    created(
+      res,
+      {
         maintenance_id: Number(maintenanceId),
         part_id: Number(part_id),
         quantity_used: Number(quantity_used)
-      }
-    });
+      },
+      "Maintenance part added"
+    );
   } catch (error) {
-    const status =
-      error.code === "ER_DUP_ENTRY" ? 409 :
-      error.code === "ER_NO_REFERENCED_ROW_2" ? 400 :
-      500;
+    if (error.code === "ER_DUP_ENTRY") {
+      return conflict(res, "This part is already linked to the maintenance record", error.message);
+    }
 
-    const message =
-      error.code === "ER_DUP_ENTRY"
-        ? "This part is already linked to the maintenance record"
-        : error.code === "ER_NO_REFERENCED_ROW_2"
-          ? "Invalid maintenance_id or part_id"
-          : "Failed to add maintenance part";
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return badRequest(res, "Invalid maintenance_id or part_id", error.message);
+    }
 
-    res.status(status).json({
-      success: false,
-      message,
-      error: error.message
-    });
+    serverError(res, "Failed to add maintenance part", error);
   }
 });
 
@@ -441,6 +507,24 @@ router.post("/:id/parts", async (req, res) => {
 router.put("/:maintenanceId/parts/:partId", async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const { quantity_used = 1 } = req.body;
+
+  const maintenanceIdError = validatePositiveId(maintenanceId, "maintenance_id");
+
+  if (maintenanceIdError) {
+    return badRequest(res, maintenanceIdError);
+  }
+
+  const partIdError = validatePositiveId(partId, "part_id");
+
+  if (partIdError) {
+    return badRequest(res, partIdError);
+  }
+
+  const quantityError = validatePositiveId(quantity_used, "quantity_used");
+
+  if (quantityError) {
+    return badRequest(res, quantityError);
+  }
 
   try {
     const [result] = await pool.query(
@@ -451,33 +535,37 @@ router.put("/:maintenanceId/parts/:partId", async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: "Maintenance part link not found" });
+      return notFound(res, "Maintenance part link not found");
     }
 
-    res.json({
-      success: true,
-      message: "Maintenance part updated",
-      data: { maintenance_id: maintenanceId, part_id: Number(partId), quantity_used }
-    });
+    success(
+      res,
+      {
+        maintenance_id: Number(maintenanceId),
+        part_id: Number(partId),
+        quantity_used: Number(quantity_used)
+      },
+      "Maintenance part updated"
+    );
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update maintenance part",
-      error: error.message
-    });
+    serverError(res, "Failed to update maintenance part", error);
   }
 });
 
 // DELETE /api/maintenance/:id
 // delete maintenance record and dependencies
 router.delete("/:id", async (req, res) => {
+  const idError = validatePositiveId(req.params.id, "maintenance_id");
+  if (idError) {
+    return badRequest(res, idError);
+  }
   const connection = await pool.getConnection();
 
   try {
     const existing = await fetchMaintenanceById(connection, req.params.id);
     if (!existing) {
       connection.release();
-      return res.status(404).json({ success: false, message: "Maintenance record not found" });
+      return notFound(res, "Maintenance record not found");
     }
 
     await connection.beginTransaction();
@@ -486,11 +574,11 @@ router.delete("/:id", async (req, res) => {
     await connection.commit();
     connection.release();
 
-    res.json({ success: true, message: "Maintenance record deleted" });
+    success(res, undefined, "Maintenance record deleted");
   } catch (error) {
     await connection.rollback();
     connection.release();
-    res.status(500).json({ success: false, message: "Failed to delete maintenance record", error: error.message });
+    serverError(res, "Failed to delete maintenance record", error);
   }
 });
 
@@ -498,6 +586,17 @@ router.delete("/:id", async (req, res) => {
 // delete maintenance part
 router.delete("/:maintenanceId/parts/:partId", async (req, res) => {
   const { maintenanceId, partId } = req.params;
+  const maintenanceIdError = validatePositiveId(maintenanceId, "maintenance_id");
+
+  if (maintenanceIdError) {
+    return badRequest(res, maintenanceIdError);
+  }
+
+  const partIdError = validatePositiveId(partId, "part_id");
+
+  if (partIdError) {
+    return badRequest(res, partIdError);
+  }
 
   try {
     const [result] = await pool.query(
@@ -506,16 +605,12 @@ router.delete("/:maintenanceId/parts/:partId", async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: "Maintenance part link not found" });
+      return notFound(res, "Maintenance part link not found");
     }
 
-    res.json({ success: true, message: "Maintenance part deleted" });
+    success(res, undefined, "Maintenance part deleted");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete maintenance part",
-      error: error.message
-    });
+    serverError(res, "Failed to delete maintenance part", error);
   }
 });
 

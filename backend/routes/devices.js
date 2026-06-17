@@ -1,7 +1,17 @@
 const express = require("express");
 const pool = require("../config/mysql");
+const { success, created, badRequest, notFound, serverError, conflict } = require("../utils/apiResponse");
+const {
+  requireFields,
+  validatePositiveId,
+  validateField,
+  isNonNegativeNumber,
+  isDateString
+} = require("../utils/validation");
 
 const router = express.Router();
+//must match values defined in sql script
+const RISK_STATUSES = ["Low", "Medium", "High", "Critical"];
 
 // fetch one device with lookup details
 async function fetchDeviceById(connection, deviceId) {
@@ -55,13 +65,9 @@ router.get("/", async (req, res) => {
       ORDER BY d.created_at DESC`
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load devices",
-      error: error.message
-    });
+    serverError(res, "Failed to load devices", error);
   }
 });
 
@@ -83,13 +89,9 @@ router.get("/high-risk", async (req, res) => {
       WHERE d.risk_status IN ('High', 'Critical')
       ORDER BY d.risk_status DESC, d.age_years DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load high-risk devices",
-      error: error.message
-    });
+    serverError(res, "Failed to load high-risk devices", error);
   }
 });
 
@@ -103,13 +105,9 @@ router.get("/manufacturers", async (req, res) => {
        ORDER BY manufacturer_name ASC`
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load manufacturers",
-      error: error.message
-    });
+    serverError(res, "Failed to load manufacturers", error);
   }
 });
 
@@ -123,13 +121,9 @@ router.get("/device-types", async (req, res) => {
        ORDER BY type_name ASC`
     );
 
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load device types",
-      error: error.message
-    });
+    serverError(res, "Failed to load device types", error);
   }
 });
 
@@ -137,22 +131,20 @@ router.get("/device-types", async (req, res) => {
 // single device lookup
 router.get("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "device_id");
+    if (idError) {
+      return badRequest(res, idError);
+    }
+
     const device = await fetchDeviceById(pool, req.params.id);
 
     if (!device) {
-      return res.status(404).json({
-        success: false,
-        message: "Device not found"
-      });
+      return notFound(res, "Device not found");
     }
 
-    res.json({ success: true, data: device });
+    success(res, device);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load device",
-      error: error.message
-    });
+    serverError(res, "Failed to load device", error);
   }
 });
 
@@ -169,11 +161,36 @@ router.post("/", async (req, res) => {
     risk_status = "Low"
   } = req.body;
 
-  if (!device_code || !device_type_id || !manufacturer_id) {
-    return res.status(400).json({
-      success: false,
-      message: "device_code, device_type_id, and manufacturer_id are required"
-    });
+  const missing = requireFields(req.body, [
+    "device_code",
+    "device_type_id",
+    "manufacturer_id"
+  ]);
+
+  if (missing) {
+    return badRequest(res, missing);
+  }
+
+  let validationError =
+    validatePositiveId(device_type_id, "device_type_id") ||
+    validatePositiveId(manufacturer_id, "manufacturer_id");
+
+  if (validationError) {
+    return badRequest(res, validationError);
+  }
+
+  if (age_years !== null && !isNonNegativeNumber(age_years)) {
+    return badRequest(res, "age_years must be a non-negative number");
+  }
+
+  if (!isDateString(purchase_date)) {
+    return badRequest(res, "purchase_date must use YYYY-MM-DD format");
+  }
+
+  validationError = validateField(risk_status, "risk_status", RISK_STATUSES);
+
+  if (validationError) {
+    return badRequest(res, validationError);
   }
 
   try {
@@ -186,32 +203,55 @@ router.post("/", async (req, res) => {
 
     const device = await fetchDeviceById(pool, result.insertId);
 
-    res.status(201).json({
-      success: true,
-      message: "Device created",
-      data: device
-    });
+    //success
+    created(res, device, "Device created");
+
   } catch (error) {
-    const status = error.code === "ER_DUP_ENTRY" ? 409 : 500;
-    res.status(status).json({
-      success: false,
-      message: "Failed to create device",
-      error: error.message
-    });
+    if (error.code === "ER_DUP_ENTRY") {
+      return conflict(res, "Device code already exists", error.message);
+    }
+
+    serverError(res, "Failed to create device", error);
   }
 });
 
 // PUT /api/devices/:id
 // update device
 router.put("/:id", async (req, res) => {
+  // validate before fetch device by id
   try {
+    const idError = validatePositiveId(req.params.id, "device_id");
+
+    if (idError) {
+      return badRequest(res, idError);
+    }
+    if (req.body.device_type_id !== undefined) {
+      const validationError = validatePositiveId(req.body.device_type_id, "device_type_id");
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.manufacturer_id !== undefined) {
+      const validationError = validatePositiveId(req.body.manufacturer_id, "manufacturer_id");
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.age_years !== undefined && req.body.age_years !== null && !isNonNegativeNumber(req.body.age_years)) {
+      return badRequest(res, "age_years must be a non-negative number");
+    }
+
+    if (req.body.purchase_date !== undefined && !isDateString(req.body.purchase_date)) {
+      return badRequest(res, "purchase_date must use YYYY-MM-DD format");
+    }
+
+    if (req.body.risk_status !== undefined) {
+      const validationError = validateField(req.body.risk_status, "risk_status", RISK_STATUSES);
+      if (validationError) return badRequest(res, validationError);
+    }
+
     const existing = await fetchDeviceById(pool, req.params.id);
 
     if (!existing) {
-      return res.status(404).json({
-        success: false,
-        message: "Device not found"
-      });
+      return notFound(res, "Device not found");
     }
 
     const next = {
@@ -248,24 +288,26 @@ router.put("/:id", async (req, res) => {
 
     const device = await fetchDeviceById(pool, req.params.id);
 
-    res.json({
-      success: true,
-      message: "Device updated",
-      data: device
-    });
+    success(res, device, "Device updated");
   } catch (error) {
-    const status = error.code === "ER_DUP_ENTRY" ? 409 : 500;
-    res.status(status).json({
-      success: false,
-      message: "Failed to update device",
-      error: error.message
-    });
+    if (error.code === "ER_DUP_ENTRY") {
+      return conflict(res, "Device code already exists", error.message);
+    }
+
+    serverError(res, "Failed to update device", error);
   }
 });
 
 // DELETE /api/devices/:id
 // delete device and dependencies
 router.delete("/:id", async (req, res) => {
+  //validate id before get connection
+  const idError = validatePositiveId(req.params.id, "device_id");
+
+  if (idError) {
+    return badRequest(res, idError);
+  }
+
   const connection = await pool.getConnection();
 
   try {
@@ -273,10 +315,7 @@ router.delete("/:id", async (req, res) => {
 
     if (!existing) {
       connection.release();
-      return res.status(404).json({
-        success: false,
-        message: "Device not found"
-      });
+      return notFound(res, "Device not found");
     }
 
     await connection.beginTransaction();
@@ -306,18 +345,11 @@ router.delete("/:id", async (req, res) => {
     await connection.commit();
     connection.release();
 
-    res.json({
-      success: true,
-      message: "Device deleted"
-    });
+    success(res, undefined, "Device deleted");
   } catch (error) {
     await connection.rollback();
     connection.release();
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete device",
-      error: error.message
-    });
+    serverError(res, "Failed to delete device", error);
   }
 });
 

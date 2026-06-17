@@ -1,7 +1,18 @@
 const express = require("express");
 const pool = require("../config/mysql");
+const { success, created, badRequest, notFound, serverError } = require("../utils/apiResponse");
+const {
+  requireFields,
+  validatePositiveId,
+  validateField,
+  isNonNegativeNumber
+} = require("../utils/validation");
 
 const router = express.Router();
+
+//match values in sql file
+const SEVERITIES = ["Low", "Medium", "High", "Critical"];
+const REPORT_STATUSES = ["Open", "In Progress", "Resolved"];
 
 // fetch one failure with device and manufacturer details
 async function fetchFailureById(connection, failureId) {
@@ -46,13 +57,9 @@ router.get("/", async (req, res) => {
       JOIN devices d ON fr.device_id = d.device_id
       ORDER BY fr.created_at DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load failure summary",
-      error: error.message
-    });
+    serverError(res, "Failed to load failure records", error);
   }
 });
 
@@ -72,13 +79,9 @@ router.get("/summary", async (req, res) => {
       GROUP BY dt.type_name
       ORDER BY total_failure_events DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load failure summary",
-      error: error.message
-    });
+    serverError(res, "Failed to load failure records", error);
   }
 });
 
@@ -101,13 +104,9 @@ router.get("/above-average-devices", async (req, res) => {
       )
       ORDER BY fr.failure_event_count DESC`
     );
-    res.json({ success: true, data: rows });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load above-average failure devices",
-      error: error.message
-    });
+    serverError(res, "Failed to load failure records", error);
   }
 });
 
@@ -122,11 +121,27 @@ router.post("/", async (req, res) => {
     report_status = "Open"
   } = req.body;
 
-  if (!device_id) {
-    return res.status(400).json({
-      success: false,
-      message: "device_id is required"
-    });
+  const missing = requireFields(req.body, ["device_id"]);
+
+  if (missing) {
+    return badRequest(res, missing);
+  }
+
+  let validationError =
+    validatePositiveId(device_id, "device_id") ||
+    validateField(severity, "severity", SEVERITIES) ||
+    validateField(report_status, "report_status", REPORT_STATUSES);
+
+  if (validationError) {
+    return badRequest(res, validationError);
+  }
+
+  if (!isNonNegativeNumber(failure_event_count)) {
+    return badRequest(res, "failure_event_count must be a non-negative number");
+  }
+
+  if (!isNonNegativeNumber(downtime_hours)) {
+    return badRequest(res, "downtime_hours must be a non-negative number");
   }
 
   try {
@@ -139,17 +154,13 @@ router.post("/", async (req, res) => {
 
     const failure = await fetchFailureById(pool, result.insertId);
 
-    res.status(201).json({
-      success: true,
-      message: "Failure record created",
-      data: failure
-    });
+    created(res, failure, "Failure record created");
   } catch (error) {
-    res.status(error.code === "ER_NO_REFERENCED_ROW_2" ? 400 : 500).json({
-      success: false,
-      message: "Failed to create failure record",
-      error: error.message
-    });
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return badRequest(res, "Invalid device_id", error.message);
+    }
+
+    serverError(res, "Failed to create failure record", error);
   }
 });
 
@@ -157,13 +168,40 @@ router.post("/", async (req, res) => {
 // update failure record
 router.put("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "failure_id");
+
+    if (idError) {
+      return badRequest(res, idError);
+    }
+
+    if (req.body.device_id !== undefined) {
+      const validationError = validatePositiveId(req.body.device_id, "device_id");
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.failure_event_count !== undefined && !isNonNegativeNumber(req.body.failure_event_count)) {
+      return badRequest(res, "failure_event_count must be a non-negative number");
+    }
+
+    if (req.body.downtime_hours !== undefined && !isNonNegativeNumber(req.body.downtime_hours)) {
+      return badRequest(res, "downtime_hours must be a non-negative number");
+    }
+
+    if (req.body.severity !== undefined) {
+      const validationError = validateField(req.body.severity, "severity", SEVERITIES);
+      if (validationError) return badRequest(res, validationError);
+    }
+
+    if (req.body.report_status !== undefined) {
+      const validationError = validateField(req.body.report_status, "report_status", REPORT_STATUSES);
+      if (validationError) return badRequest(res, validationError);
+    }
+
+
     const existing = await fetchFailureById(pool, req.params.id);
 
     if (!existing) {
-      return res.status(404).json({
-        success: false,
-        message: "Failure record not found"
-      });
+      return notFound(res, "Failure record not found");
     }
 
     const next = {
@@ -194,17 +232,12 @@ router.put("/:id", async (req, res) => {
 
     const failure = await fetchFailureById(pool, req.params.id);
 
-    res.json({
-      success: true,
-      message: "Failure record updated",
-      data: failure
-    });
+    success(res, failure, "Failure record updated");
   } catch (error) {
-    res.status(error.code === "ER_NO_REFERENCED_ROW_2" ? 400 : 500).json({
-      success: false,
-      message: "Failed to update failure record",
-      error: error.message
-    });
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return badRequest(res, "Invalid device_id", error.message);
+    }
+    serverError(res, "Failed to update failure record", error);
   }
 });
 
@@ -212,12 +245,19 @@ router.put("/:id", async (req, res) => {
 // update failure report status
 router.patch("/:id/status", async (req, res) => {
   const { report_status } = req.body;
+  const idError = validatePositiveId(req.params.id, "failure_id");
 
-  if (!report_status) {
-    return res.status(400).json({
-      success: false,
-      message: "report_status is required"
-    });
+  if (idError) {
+    return badRequest(res, idError);
+  }
+
+  const missing = requireFields(req.body, ["report_status"]);
+  if (missing) {
+    return badRequest(res, missing);
+  }
+  const validationError = validateField(report_status, "report_status", REPORT_STATUSES);
+  if (validationError) {
+    return badRequest(res, validationError);
   }
 
   try {
@@ -229,25 +269,14 @@ router.patch("/:id/status", async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Failure record not found"
-      });
+      return notFound(res, "Failure record not found");
     }
 
     const failure = await fetchFailureById(pool, req.params.id);
 
-    res.json({
-      success: true,
-      message: "Failure status updated",
-      data: failure
-    });
+    success(res, failure, "Failure status updated");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to update failure status",
-      error: error.message
-    });
+    serverError(res, "Failed to update failure status", error);
   }
 });
 
@@ -255,22 +284,19 @@ router.patch("/:id/status", async (req, res) => {
 // single failure lookup
 router.get("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "failure_id");
+    if (idError) {
+      return badRequest(res, idError);
+    }
     const failure = await fetchFailureById(pool, req.params.id);
 
     if (!failure) {
-      return res.status(404).json({
-        success: false,
-        message: "Failure record not found"
-      });
+      return notFound(res, "Failure record not found");
     }
 
-    res.json({ success: true, data: failure });
+    success(res, failure);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load failure record",
-      error: error.message
-    });
+    serverError(res, "Failed to load failure record", error);
   }
 });
 
@@ -278,28 +304,23 @@ router.get("/:id", async (req, res) => {
 // delete failure record
 router.delete("/:id", async (req, res) => {
   try {
+    const idError = validatePositiveId(req.params.id, "failure_id");
+
+    if (idError) {
+      return badRequest(res, idError);
+    }
     const [result] = await pool.query(
       `DELETE FROM failure_reports WHERE failure_id = ?`,
       [req.params.id]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Failure record not found"
-      });
+      return notFound(res, "Failure record not found");
     }
 
-    res.json({
-      success: true,
-      message: "Failure record deleted"
-    });
+    success(res, undefined, "Failure record deleted");
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete failure record",
-      error: error.message
-    });
+    serverError(res, "Failed to delete failure record", error);
   }
 });
 

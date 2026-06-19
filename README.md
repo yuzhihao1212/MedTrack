@@ -1,190 +1,540 @@
-# MedTrack — DB_INF2003_GRP23
+# MedTrack
 
-Medical device tracking system built with **Express**, **MySQL**, and **MongoDB**.
+MedTrack is a hybrid SQL and NoSQL database application developed for the INF2003 Database Systems project. The system supports medical device failure monitoring, maintenance tracking, dashboard analytics, and NoSQL document logging.
+
+The project uses a real-world medical device failure dataset and demonstrates relational database modelling, SQL CRUD operations, NoSQL document storage, backend API integration, and frontend dashboard development.
 
 ---
 
-## Project structure
+## Project Overview
 
+Healthcare facilities rely on medical devices such as CT scanners, MRI scanners, PET scanners, infusion pumps, defibrillators, and X-Ray machines. When these devices fail, they may cause downtime, increased maintenance cost, and operational disruption.
+
+MedTrack aims to organise medical device records, track failure events, monitor maintenance information, identify high-risk devices, and provide maintenance-related insights through a hybrid database design.
+
+The system uses:
+
+* MySQL for structured relational data
+* MongoDB for flexible NoSQL document records
+* Node.js and Express.js for the backend API
+* HTML, CSS, and JavaScript for the frontend interface
+
+---
+
+## Main Features
+
+### 1. Dashboard Analytics
+
+The dashboard displays key system statistics such as:
+
+* Total medical devices
+* Unresolved failures
+* High-risk devices
+* Completed maintenance records
+* Average maintenance cost
+* Failure summary by device type
+* High-risk device list
+
+The dashboard retrieves live values from the backend API and MySQL database.
+
+---
+
+### 2. Device Management
+
+The Devices page supports MySQL CRUD operations for medical device records.
+
+Users can:
+
+* View medical device records
+* Search devices
+* Add new device records
+* Edit existing device records
+* Delete device records
+
+Device information includes:
+
+* Device code
+* Device type
+* Manufacturer
+* Model
+* Purchase date
+* Device age
+* Risk status
+
+---
+
+### 3. Failure Tracking
+
+The Failures page supports CRUD operations for device failure reports.
+
+Users can:
+
+* View failure records
+* Add new failure records
+* Edit failure details
+* Delete failure records
+* Track failure event count
+* Track downtime hours
+* Monitor severity and report status
+
+Failure records are linked to devices through relational database relationships.
+
+---
+
+### 4. Maintenance Tracking
+
+The Maintenance page supports CRUD operations for maintenance records.
+
+Users can:
+
+* View maintenance records
+* Add new maintenance records
+* Edit maintenance details
+* Delete maintenance records
+* Track maintenance frequency
+* Assign technicians
+* Monitor repair status
+* Track maintenance cost and priority
+
+Maintenance records are stored in MySQL and linked to devices and technicians.
+
+---
+
+### 5. NoSQL Logs
+
+The NoSQL Logs page demonstrates MongoDB document storage.
+
+Users can:
+
+* Add technician notes
+* Add device event logs
+* View technician notes
+* View event logs
+* Verify inserted NoSQL documents in MongoDB
+
+MongoDB is used for flexible records that may not follow a strict relational schema, such as notes, logs, alerts, sensor snapshots, and audit records.
+
+---
+
+## Dataset
+
+The project uses the Medical Device Failure Dataset from Kaggle.
+
+Dataset source:
+
+```text
+Medical Device Failure Dataset (Anonymized)
+Kaggle
+https://www.kaggle.com/datasets/antoinepierreno/medical-device-failure-dataset-anonymized
 ```
-DatabaseProj/
+
+The dataset contains:
+
+* 4,149 medical device records
+* 6 device categories
+* 6 manufacturers
+* No missing values found during profiling
+
+Device categories include:
+
+* CT Scanner
+* MRI Scanner
+* PET Scanner
+* X-Ray Machine
+* Infusion Pump
+* Defibrillator
+
+Important dataset fields include:
+
+* Device ID
+* Device type
+* Manufacturer
+* Model
+* Purchase date
+* Maintenance cost
+* Downtime
+* Maintenance frequency
+* Failure event count
+* Maintenance class
+* Maintenance report
+
+---
+
+## Data Cleaning and Preparation
+
+The dataset was cleaned and prepared before database implementation.
+
+Cleaning and preparation work included:
+
+* Standardising column names
+* Checking missing values
+* Checking duplicate device IDs
+* Reviewing maintenance cost anomalies
+* Creating cleaned maintenance cost values
+* Deriving risk status
+* Deriving maintenance priority
+* Creating dataset profile and summary files
+* Mapping the flat dataset into relational and NoSQL structures
+
+The cleaned dataset is used by the loader script to populate MySQL and MongoDB.
+
+---
+
+## Database Design
+
+MedTrack uses a hybrid database architecture.
+
+### MySQL Relational Database
+
+MySQL stores structured data with clear relationships, primary keys, foreign keys, and constraints.
+
+Main MySQL tables:
+
+* users
+* manufacturers
+* device_types
+* devices
+* technicians
+* failure_reports
+* maintenance_records
+* parts
+* maintenance_parts
+
+Main relationships include:
+
+* One manufacturer can produce many devices
+* One device type can apply to many devices
+* One device can have many failure reports
+* One device can have many maintenance records
+* One technician can handle many maintenance records
+* Maintenance records and parts have a many-to-many relationship through maintenance_parts
+
+### MongoDB NoSQL Database
+
+MongoDB stores flexible and semi-structured data.
+
+Main MongoDB collections:
+
+* technician_notes
+* device_event_logs
+* sensor_snapshots
+* alert_history
+* audit_logs
+
+MongoDB is used for data such as technician observations, event messages, sensor-style snapshots, alert records, and system activity logs.
+
+---
+
+## System Architecture
+
+MedTrack follows a web-based system architecture.
+
+```text
+Frontend → Backend API → MySQL / MongoDB
+```
+
+The frontend provides user pages for dashboard analytics, device management, failure tracking, maintenance tracking, and NoSQL logs.
+
+The backend is built using Node.js and Express.js. It handles API routing, validation, MySQL queries, MongoDB document operations, and responses to the frontend.
+
+MySQL stores structured relational data, while MongoDB stores flexible document-based data.
+
+---
+
+## Technology Stack
+
+| Layer               | Technology                         |
+| ------------------- | ---------------------------------- |
+| Frontend            | HTML, CSS, JavaScript              |
+| Backend             | Node.js, Express.js                |
+| Relational Database | MySQL                              |
+| NoSQL Database      | MongoDB                            |
+| Data Loading        | Node.js loader script              |
+| API Testing         | Browser / Postman / Thunder Client |
+| Version Control     | Git and GitHub                     |
+
+---
+
+## Project Folder Structure
+
+```text
+DB_INF2003_GRP23/
 ├── backend/
 │   ├── config/
-│   │   ├── mongodb.js        # MongoDB connection
-│   │   └── mysql.js          # MySQL connection pool
-│   ├── models/               # MongoDB document models
+│   ├── models/
 │   ├── routes/
-│   │   ├── dashboard.js      # GET /api/dashboard
-│   │   ├── devices.js        # CRUD /api/devices
-│   │   ├── failures.js       # CRUD /api/failures
-│   │   ├── logs.js           # GET  /api/logs
-│   │   └── maintenance.js    # CRUD /api/maintenance
 │   ├── utils/
-│   │   ├── apiResponse.js    # Standardised response helpers
-│   │   └── validation.js     # Input validators
-│   ├── server.js             # Express entry point (port 3000)
+│   ├── server.js
 │   └── package.json
+│
 ├── database/
+│   ├── raw/
 │   ├── cleaned/
-│   │   └── cleaned_medtrack_dataset.csv   # 4,149 real device records
-│   ├── nosql/
-│   │   ├── collections.md    # MongoDB collection design
-│   │   ├── aggregations.js   # MongoDB aggregation examples
-│   │   └── nosql_crud.js     # MongoDB CRUD examples
+│   ├── analysis/
 │   ├── sql/
-│   │   ├── schema.sql        # CREATE TABLE statements (run first)
-│   │   ├── triggers.sql      # Risk-status trigger
-│   │   ├── views.sql         # Reporting views
-│   │   ├── indexes.sql       # Performance indexes
-│   │   ├── advanced_queries.sql
-│   │   └── seed.sql          # Small fictional dataset (dev only)
-│   └── loader.js             # Real data loader (reads CSV → MySQL + MongoDB)
+│   ├── nosql/
+│   └── loader.js
+│
 ├── docs/
+│   ├── erd.dbml
 │   ├── dataset_summary.md
 │   └── dataset_to_database_mapping.md
-└── frontend/
-    ├── index.html
-    ├── dashboard.html
-    ├── devices.html
-    ├── failures.html
-    ├── logs.html
-    ├── css/styles.css
-    └── js/
-        ├── api.js
-        ├── dashboard.js
-        ├── devices.js
-        ├── failures.js
-        └── maintenance.js
+│
+├── frontend/
+│   ├── index.html
+│   ├── dashboard.html
+│   ├── devices.html
+│   ├── failures.html
+│   ├── maintenance.html
+│   ├── logs.html
+│   ├── css/
+│   │   └── styles.css
+│   └── js/
+│       ├── api.js
+│       ├── dashboard.js
+│       ├── devices.js
+│       ├── failures.js
+│       ├── maintenance.js
+│       └── logs.js
+│
+├── README.md
+├── package.json
+└── .gitignore
 ```
 
 ---
 
-## Prerequisites
+## Setup Instructions
 
-| Tool | Version |
-|---|---|
-| Node.js | 18+ |
-| MySQL | 8.0+ |
-| MongoDB | 6.0+ |
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/kthgoat/DB_INF2003_GRP23.git
+cd DB_INF2003_GRP23
+```
 
 ---
 
-## Setup
+### 2. Install root dependencies
 
-### 1. Create the `.env` file
-
-Create a `.env` file inside the `backend/` folder:
-
-```env
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3308
-MYSQL_USER=root
-MYSQL_PASSWORD=Root123!
-MYSQL_DATABASE=medtrack
-
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=medtrack_nosql
-
-PORT=3000
+```bash
+npm install
 ```
 
-> The `MYSQL_PORT` must match the port configured in `backend/config/mysql.js`.
+These dependencies are used by the data loader.
 
-### 2. Install dependencies
+---
+
+### 3. Install backend dependencies
 
 ```bash
 cd backend
 npm install
+cd ..
 ```
 
-### 3. Initialise the MySQL database
+---
 
-Run these SQL files in order against your MySQL instance:
+### 4. Create the environment file
+
+Create a `.env` file in the project root and also ensure the backend can access its own `.env` file if needed.
+
+Example `.env`:
+
+```env
+PORT=3000
+
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=medtrack
+
+MONGODB_URI=mongodb://127.0.0.1:27017/medtrack_nosql
+MONGO_URI=mongodb://127.0.0.1:27017
+MONGO_DB=medtrack_nosql
+```
+
+If your MySQL has a password, update:
+
+```env
+MYSQL_PASSWORD=your_password
+```
+
+Do not commit `.env` to GitHub.
+
+---
+
+### 5. Start MySQL and MongoDB
+
+For macOS Homebrew users:
+
+```bash
+brew services start mysql
+brew services start mongodb-community
+```
+
+Check services:
+
+```bash
+brew services list
+```
+
+---
+
+### 6. Create MySQL schema
+
+```bash
+mysql -u root < database/sql/schema.sql
+mysql -u root medtrack < database/sql/views.sql
+mysql -u root medtrack < database/sql/indexes.sql
+mysql -u root medtrack < database/sql/triggers.sql
+```
+
+If your MySQL uses a password, use:
 
 ```bash
 mysql -u root -p < database/sql/schema.sql
-mysql -u root -p < database/sql/triggers.sql
-mysql -u root -p < database/sql/views.sql
-mysql -u root -p < database/sql/indexes.sql
+mysql -u root -p medtrack < database/sql/views.sql
+mysql -u root -p medtrack < database/sql/indexes.sql
+mysql -u root -p medtrack < database/sql/triggers.sql
 ```
 
-### 4. Load the real dataset
+---
 
-This loads all 4,149 device records from the CSV into MySQL and MongoDB:
+### 7. Load the dataset
+
+```bash
+node -r dotenv/config database/loader.js
+```
+
+After loading, verify the records:
+
+```bash
+mysql -u root -e "USE medtrack; SELECT COUNT(*) AS total_devices FROM devices;"
+mysql -u root -e "USE medtrack; SELECT COUNT(*) AS total_failures FROM failure_reports;"
+mysql -u root -e "USE medtrack; SELECT COUNT(*) AS total_maintenance FROM maintenance_records;"
+```
+
+Expected result:
+
+```text
+devices: 4149
+failure_reports: 4149
+maintenance_records: 4149
+```
+
+---
+
+### 8. Start the backend server
 
 ```bash
 cd backend
-node ../database/loader.js
+npm run dev
 ```
 
-The loader inserts:
-- 6 manufacturers and 6 device types (derived from the CSV)
-- 8 technicians and 10 spare parts (static seed)
-- 4,149 devices with deployment country, purchase date, age, and risk status
-- One `failure_report` per device (failure count, downtime, severity)
-- One `maintenance_record` per device (cost, frequency, assigned technician, parts used)
-- `technician_notes` documents in MongoDB (free-text maintenance reports keyed by `device_code`)
-
-> **Note:** Run `schema.sql` before the loader. Run the loader instead of `seed.sql` for real data. `seed.sql` is a small fictional dataset for local development only.
-
----
-
-## Running the server
+If that does not work:
 
 ```bash
-cd backend
-npm run dev      # development (nodemon, auto-restart)
-npm start        # production
+npm start
 ```
 
-Server starts at `http://localhost:3000`.
+---
+
+### 9. Open the frontend
+
+Open this in your browser:
+
+```text
+http://localhost:3000
+```
+
+or:
+
+```text
+http://localhost:3000/index.html
+```
 
 ---
 
-## API endpoints
+## API Routes
 
-| Method | Route | Description |
-|---|---|---|
-| GET | `/api/health` | Health check |
-| GET | `/api/devices` | List all devices |
-| GET | `/api/devices/:id` | Single device |
-| GET | `/api/devices/high-risk` | Devices with High or Critical risk |
-| GET | `/api/devices/manufacturers` | Manufacturer lookup list |
-| GET | `/api/devices/device-types` | Device type lookup list |
-| POST | `/api/devices` | Create device |
-| PUT | `/api/devices/:id` | Update device |
-| DELETE | `/api/devices/:id` | Delete device and its records |
-| GET | `/api/failures` | List failure reports |
-| POST | `/api/failures` | Create failure report |
-| PUT | `/api/failures/:id` | Update failure report |
-| DELETE | `/api/failures/:id` | Delete failure report |
-| GET | `/api/maintenance` | List maintenance records |
-| POST | `/api/maintenance` | Create maintenance record |
-| PUT | `/api/maintenance/:id` | Update maintenance record |
-| DELETE | `/api/maintenance/:id` | Delete maintenance record |
-| GET | `/api/dashboard` | Dashboard summary stats |
-| GET | `/api/logs` | MongoDB event logs |
+Main backend routes include:
+
+```text
+GET /api/health
+GET /api/dashboard
+GET /api/devices
+GET /api/failures
+GET /api/maintenance
+GET /api/logs
+```
+
+The frontend communicates with these API routes to retrieve and update system data.
 
 ---
 
-## Database design
+## Testing Completed
 
-### MySQL (relational core)
+The following tests have been completed successfully:
 
-Tables: `users`, `manufacturers`, `device_types`, `devices`, `technicians`, `failure_reports`, `maintenance_records`, `parts`, `maintenance_parts`
-
-- `country` is stored on `devices` (deployment location), not on `manufacturers`
-- A trigger on `failure_reports` automatically updates `devices.risk_status` based on `failure_event_count`
-
-### MongoDB (operational data)
-
-Collections: `technician_notes`, `device_event_logs`, `sensor_snapshots`, `alert_history`, `audit_logs`
-
-- Documents reference `device_code` as a soft foreign key back to MySQL
-- See `database/nosql/collections.md` for full schema and index design
+* MySQL service started successfully
+* MongoDB service started successfully
+* SQL schema created successfully
+* MySQL tables created successfully
+* Dataset loaded successfully into MySQL
+* 4,149 device records loaded
+* 4,149 failure records loaded
+* 4,149 maintenance records loaded
+* Dashboard displays real database values
+* Devices page loads records from MySQL
+* Failures page loads records from MySQL
+* Maintenance page loads records from MySQL
+* CRUD operations tested successfully
+* NoSQL Logs page tested successfully
+* Technician notes inserted into MongoDB
+* Device event logs inserted into MongoDB
+* MongoDB document insertion verified
 
 ---
 
-## Team
+## Current Project Status
 
-Group 23 — INF2003 Database Systems
+Completed:
+
+* Dataset selection
+* Dataset cleaning and profiling
+* SQL schema design
+* ERD planning
+* MySQL relational database implementation
+* MongoDB collection design
+* Backend API setup
+* Frontend dashboard and CRUD pages
+* MySQL CRUD testing
+* MongoDB NoSQL insertion testing
+* GitHub branch merge into main
+
+Remaining work:
+
+* Final UI polish if required
+* Additional screenshots for report and presentation
+* Final report writing
+* Presentation slides
+* Video demonstration
+* Final testing on team members’ machines
+
+---
+
+## References
+
+[1] Express.js. (n.d.). Express documentation. https://expressjs.com/
+
+[2] MongoDB Inc. (n.d.). MongoDB documentation. https://www.mongodb.com/docs/
+
+[3] OpenJS Foundation. (n.d.). Node.js documentation. https://nodejs.org/en/docs
+
+[4] Oracle. (n.d.). MySQL documentation. https://dev.mysql.com/doc/
+
+[5] Pierreno, A. (n.d.). Medical device failure dataset (anonymized) [Data set]. Kaggle. https://www.kaggle.com/datasets/antoinepierreno/medical-device-failure-dataset-anonymized
+
+[6] Rahman, N. H. A., Mohamad Zaki, M. H., Hasikin, K., Abd Razak, N. A., Ibrahim, A. K., & Lai, K. W. (2023). Predicting medical device failure: A promise to reduce healthcare facilities cost through smart healthcare management. PeerJ Computer Science, 9, Article e1279. https://doi.org/10.7717/peerj-cs.1279

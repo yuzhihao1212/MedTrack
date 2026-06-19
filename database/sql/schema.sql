@@ -21,8 +21,7 @@ CREATE TABLE users (
 
 CREATE TABLE manufacturers (
     manufacturer_id INT PRIMARY KEY AUTO_INCREMENT,
-    manufacturer_name VARCHAR(100) NOT NULL UNIQUE,
-    country VARCHAR(100)
+    manufacturer_name VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE device_types (
@@ -37,6 +36,7 @@ CREATE TABLE devices (
     device_type_id INT NOT NULL,
     manufacturer_id INT NOT NULL,
     model VARCHAR(100),
+    country VARCHAR(100),
     purchase_date DATE,
     age_years INT,
     risk_status ENUM('Low', 'Medium', 'High', 'Critical') DEFAULT 'Low',

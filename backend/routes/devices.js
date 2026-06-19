@@ -22,13 +22,13 @@ async function fetchDeviceById(connection, deviceId) {
       d.device_type_id,
       d.manufacturer_id,
       d.model,
+      d.country,
       d.purchase_date,
       d.age_years,
       d.risk_status,
       dt.type_name,
       dt.risk_category,
       m.manufacturer_name,
-      m.country,
       d.created_at
     FROM devices d
     JOIN device_types dt ON dt.device_type_id = d.device_type_id
@@ -51,13 +51,13 @@ router.get("/", async (req, res) => {
         d.device_type_id,
         d.manufacturer_id,
         d.model,
+        d.country,
         d.purchase_date,
         d.age_years,
         d.risk_status,
         dt.type_name,
         dt.risk_category,
         m.manufacturer_name,
-        m.country,
         d.created_at
       FROM devices d
       JOIN device_types dt ON dt.device_type_id = d.device_type_id
@@ -100,7 +100,7 @@ router.get("/high-risk", async (req, res) => {
 router.get("/manufacturers", async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT manufacturer_id, manufacturer_name, country
+      `SELECT manufacturer_id, manufacturer_name
        FROM manufacturers
        ORDER BY manufacturer_name ASC`
     );

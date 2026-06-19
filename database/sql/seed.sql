@@ -5,13 +5,13 @@ INSERT INTO users (username, password_hash, role) VALUES
 ('tech01', 'hashed_password_2', 'technician'),
 ('viewer01', 'hashed_password_3', 'viewer');
 
-INSERT INTO manufacturers (manufacturer_name, country) VALUES
-('Medtronic', 'USA'),
-('Philips Healthcare', 'Netherlands'),
-('GE Healthcare', 'USA'),
-('Siemens Healthineers', 'Germany'),
-('Fresenius Medical Care', 'Germany'),
-('Omron Healthcare', 'Japan');
+INSERT INTO manufacturers (manufacturer_name) VALUES
+('Medtronic'),
+('Philips Healthcare'),
+('GE Healthcare'),
+('Siemens Healthineers'),
+('Fresenius Medical Care'),
+('Omron Healthcare');
 
 INSERT INTO device_types (type_name, risk_category) VALUES
 ('Infusion Pump', 'High'),
@@ -33,20 +33,21 @@ INSERT INTO devices (
     device_type_id,
     manufacturer_id,
     model,
+    country,
     purchase_date,
     age_years,
     risk_status
 ) VALUES
-('MD-1001', 1, 1, 'PumpX-200', '2019-04-12', 5, 'High'),
-('MD-1002', 2, 2, 'VentPro-A9', '2018-09-20', 6, 'Critical'),
-('MD-1003', 3, 3, 'MonitorPlus-7', '2021-02-15', 3, 'Medium'),
-('MD-1004', 4, 4, 'DefibSafe-12', '2020-11-08', 4, 'High'),
-('MD-1005', 5, 5, 'DialyCare-500', '2017-06-25', 7, 'Critical'),
-('MD-1006', 6, 6, 'BPTrack-Lite', '2023-01-10', 1, 'Low'),
-('MD-1007', 1, 2, 'InfuseOne-3', '2022-05-19', 2, 'Medium'),
-('MD-1008', 3, 1, 'VitalView-8', '2020-03-30', 4, 'High'),
-('MD-1009', 2, 3, 'AirFlow-Z', '2016-12-14', 8, 'Critical'),
-('MD-1010', 5, 4, 'RenalPro-X', '2019-08-01', 5, 'High');
+('MD-1001', 1, 1, 'PumpX-200', 'USA', '2019-04-12', 5, 'High'),
+('MD-1002', 2, 2, 'VentPro-A9', 'UK', '2018-09-20', 6, 'Critical'),
+('MD-1003', 3, 3, 'MonitorPlus-7', 'France', '2021-02-15', 3, 'Medium'),
+('MD-1004', 4, 4, 'DefibSafe-12', 'Japan', '2020-11-08', 4, 'High'),
+('MD-1005', 5, 5, 'DialyCare-500', 'Canada', '2017-06-25', 7, 'Critical'),
+('MD-1006', 6, 6, 'BPTrack-Lite', 'Italy', '2023-01-10', 1, 'Low'),
+('MD-1007', 1, 2, 'InfuseOne-3', 'USA', '2022-05-19', 2, 'Medium'),
+('MD-1008', 3, 1, 'VitalView-8', 'UK', '2020-03-30', 4, 'High'),
+('MD-1009', 2, 3, 'AirFlow-Z', 'France', '2016-12-14', 8, 'Critical'),
+('MD-1010', 5, 4, 'RenalPro-X', 'Canada', '2019-08-01', 5, 'High');
 
 INSERT INTO failure_reports (
     device_id,

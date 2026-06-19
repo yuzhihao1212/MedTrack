@@ -1,7 +1,6 @@
 Table manufacturers {
   manufacturer_id int [pk, increment]
   manufacturer_name varchar(100) [not null, unique]
-  country varchar(100)
 }
 
 Table device_types {
@@ -19,6 +18,7 @@ Table devices {
   purchase_date date
   age_years int
   risk_status varchar(30)
+  country varchar(100)
 }
 
 Table failure_reports {
@@ -66,6 +66,10 @@ Table maintenance_parts {
   maintenance_id int [not null]
   part_id int [not null]
   quantity_used int [not null]
+
+  indexes {
+    (maintenance_id, part_id) [pk]
+  }
 }
 
 Ref: devices.device_type_id > device_types.device_type_id

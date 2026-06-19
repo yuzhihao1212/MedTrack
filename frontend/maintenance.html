@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Maintenance</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="devices.html">Devices</a>
+      <a href="failures.html">Failures</a>
+      <a class="active" href="maintenance.html">Maintenance</a>
+      <a href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">MySQL CRUD</p>
+        <h1>Maintenance Tracking</h1>
+      </div>
+      <button class="btn secondary" id="reloadMaintenanceBtn">Reload</button>
+    </div>
+
+    <section class="grid form-layout">
+      <article class="panel">
+        <h2 id="maintenanceFormTitle">Add Maintenance Record</h2>
+        <form id="maintenanceForm" class="form-grid">
+          <input type="hidden" id="maintenanceId" />
+
+          <label>Device
+            <select id="maintenanceDevice" required></select>
+          </label>
+
+          <label>Technician
+            <select id="technician"></select>
+          </label>
+
+          <label>Maintenance Frequency
+            <input id="maintenanceFrequency" type="number" min="0" step="1" />
+          </label>
+
+          <label>Maintenance Class
+            <input id="maintenanceClass" type="number" min="0" step="1" />
+          </label>
+
+          <label>Priority
+            <select id="maintenancePriority">
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </label>
+
+          <label>Cost
+            <input id="maintenanceCost" type="number" min="0" step="0.01" />
+          </label>
+
+          <label>Repair Status
+            <select id="repairStatus">
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>Completed</option>
+            </select>
+          </label>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit">Save Record</button>
+            <button class="btn secondary" type="button" id="resetMaintenanceFormBtn">Clear</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="panel wide-panel">
+        <div class="panel-header">
+          <h2>Maintenance Records</h2>
+          <input class="search-input" id="maintenanceSearch" placeholder="Search device, technician, priority..." />
+        </div>
+        <p class="muted" id="maintenanceStatus">Loading maintenance records...</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Technician</th>
+                <th>Frequency</th>
+                <th>Priority</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="maintenanceTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/maintenance.js"></script>
+</body>
+</html>

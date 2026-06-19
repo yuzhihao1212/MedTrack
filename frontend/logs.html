@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Logs</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="devices.html">Devices</a>
+      <a href="failures.html">Failures</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a class="active" href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">MongoDB Documents</p>
+        <h1>NoSQL Logs</h1>
+      </div>
+      <button class="btn secondary" id="reloadLogsBtn">Reload</button>
+    </div>
+
+    <section class="grid two">
+      <article class="panel">
+        <h2>Add Technician Note</h2>
+        <form id="noteForm" class="form-grid">
+          <label>Device Code
+            <input id="noteDeviceCode" type="text" placeholder="e.g. DEV-1001" required />
+          </label>
+          <label>Technician Name
+            <input id="technicianName" type="text" placeholder="Technician name" required />
+          </label>
+          <label>Note
+            <textarea id="noteText" rows="4" placeholder="Maintenance observation..." required></textarea>
+          </label>
+          <button class="btn primary" type="submit">Save Note</button>
+        </form>
+      </article>
+
+      <article class="panel">
+        <h2>Add Event Log</h2>
+        <form id="eventForm" class="form-grid">
+          <label>Device Code
+            <input id="eventDeviceCode" type="text" placeholder="e.g. DEV-1001" required />
+          </label>
+          <label>Event Type
+            <input id="eventType" type="text" placeholder="Failure / Maintenance / Alert" required />
+          </label>
+          <label>Severity
+            <select id="eventSeverity">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </label>
+          <label>Message
+            <textarea id="eventMessage" rows="3" required></textarea>
+          </label>
+          <button class="btn primary" type="submit">Save Event Log</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="grid two">
+      <article class="panel">
+        <div class="panel-header"><h2>Technician Notes</h2></div>
+        <p class="muted" id="notesStatus">Loading notes...</p>
+        <div id="notesList" class="document-list"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header"><h2>Device Event Logs</h2></div>
+        <p class="muted" id="eventsStatus">Loading event logs...</p>
+        <div id="eventsList" class="document-list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/logs.js"></script>
+</body>
+</html>

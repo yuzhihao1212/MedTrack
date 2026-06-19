@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a class="active" href="dashboard.html">Dashboard</a>
+      <a href="devices.html">Devices</a>
+      <a href="failures.html">Failures</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h1>Dashboard</h1>
+      </div>
+      <button class="btn secondary" id="refreshDashboardBtn">Refresh</button>
+    </div>
+
+    <section class="status-banner" id="dashboardStatus">Loading dashboard data...</section>
+
+    <section class="kpi-grid" id="kpiGrid">
+      <article class="kpi-card"><span>Total Devices</span><strong id="totalDevices">-</strong></article>
+      <article class="kpi-card warning"><span>Unresolved Failures</span><strong id="unresolvedFailures">-</strong></article>
+      <article class="kpi-card danger"><span>High-Risk Devices</span><strong id="highRiskDevices">-</strong></article>
+      <article class="kpi-card success"><span>Completed Maintenance</span><strong id="completedMaintenance">-</strong></article>
+      <article class="kpi-card"><span>Avg. Maintenance Cost</span><strong id="avgMaintenanceCost">-</strong></article>
+    </section>
+
+    <section class="grid two">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Failure Summary by Device Type</h2>
+        </div>
+        <div id="failureSummaryBars" class="bar-list"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <h2>High-Risk Devices</h2>
+        </div>
+        <div class="table-wrap small-table">
+          <table>
+            <thead>
+              <tr><th>Device</th><th>Type</th><th>Risk</th></tr>
+            </thead>
+            <tbody id="highRiskTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

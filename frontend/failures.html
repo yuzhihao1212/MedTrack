@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Failures</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="devices.html">Devices</a>
+      <a class="active" href="failures.html">Failures</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">MySQL CRUD</p>
+        <h1>Failure Tracking</h1>
+      </div>
+      <button class="btn secondary" id="reloadFailuresBtn">Reload</button>
+    </div>
+
+    <section class="grid form-layout">
+      <article class="panel">
+        <h2 id="failureFormTitle">Add Failure Record</h2>
+        <form id="failureForm" class="form-grid">
+          <input type="hidden" id="failureId" />
+
+          <label>Device
+            <select id="failureDevice" required></select>
+          </label>
+
+          <label>Failure Event Count
+            <input id="failureCount" type="number" min="0" step="1" required />
+          </label>
+
+          <label>Downtime Hours
+            <input id="downtimeHours" type="number" min="0" step="0.01" required />
+          </label>
+
+          <label>Severity
+            <select id="severity">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </label>
+
+          <label>Report Status
+            <select id="reportStatus">
+              <option>Open</option>
+              <option>In Progress</option>
+              <option>Resolved</option>
+            </select>
+          </label>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit">Save Failure</button>
+            <button class="btn secondary" type="button" id="resetFailureFormBtn">Clear</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="panel wide-panel">
+        <div class="panel-header">
+          <h2>Failure Records</h2>
+          <input class="search-input" id="failureSearch" placeholder="Search device, severity, status..." />
+        </div>
+        <p class="muted" id="failureStatus">Loading failures...</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Events</th>
+                <th>Downtime</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="failuresTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/failures.js"></script>
+</body>
+</html>

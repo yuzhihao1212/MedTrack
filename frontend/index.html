@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Home</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="devices.html">Devices</a>
+      <a href="failures.html">Failures</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page hero-page">
+    <section class="hero-card">
+      <p class="eyebrow">Hybrid SQL + NoSQL Database System</p>
+      <h1>Medical Device Failure and Maintenance Monitoring</h1>
+      <p class="hero-text">
+        MedTrack helps organise medical device records, monitor failure patterns,
+        track maintenance work, and identify high-risk devices using MySQL and MongoDB.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="dashboard.html">Open Dashboard</a>
+        <a class="btn secondary" href="devices.html">Manage Devices</a>
+      </div>
+    </section>
+
+    <section class="grid three">
+      <article class="info-card">
+        <h3>MySQL</h3>
+        <p>Stores structured device, failure, maintenance, technician, parts, and user records.</p>
+      </article>
+      <article class="info-card">
+        <h3>MongoDB</h3>
+        <p>Stores flexible technician notes, event logs, sensor snapshots, alert history, and audit logs.</p>
+      </article>
+      <article class="info-card">
+        <h3>Express API</h3>
+        <p>Connects the frontend to both databases through REST API routes.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

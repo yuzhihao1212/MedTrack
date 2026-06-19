@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Devices</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a class="active" href="devices.html">Devices</a>
+      <a href="failures.html">Failures</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a href="logs.html">Logs</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">MySQL CRUD</p>
+        <h1>Device Management</h1>
+      </div>
+      <button class="btn secondary" id="reloadDevicesBtn">Reload</button>
+    </div>
+
+    <section class="grid form-layout">
+      <article class="panel">
+        <h2 id="deviceFormTitle">Add Device</h2>
+        <form id="deviceForm" class="form-grid">
+          <input type="hidden" id="deviceId" />
+
+          <label>Device Code
+            <input id="deviceCode" type="text" placeholder="e.g. DEV-1001" required />
+          </label>
+
+          <label>Device Type
+            <select id="deviceType" required></select>
+          </label>
+
+          <label>Manufacturer
+            <select id="manufacturer" required></select>
+          </label>
+
+          <label>Model
+            <input id="model" type="text" placeholder="Model name" />
+          </label>
+
+          <label>Purchase Date
+            <input id="purchaseDate" type="date" />
+          </label>
+
+          <label>Age Years
+            <input id="ageYears" type="number" min="0" step="1" />
+          </label>
+
+          <label>Risk Status
+            <select id="riskStatus">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </label>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit">Save Device</button>
+            <button class="btn secondary" type="button" id="resetDeviceFormBtn">Clear</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="panel wide-panel">
+        <div class="panel-header">
+          <h2>Device Records</h2>
+          <input class="search-input" id="deviceSearch" placeholder="Search device, type, manufacturer..." />
+        </div>
+        <p class="muted" id="deviceStatus">Loading devices...</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Manufacturer</th>
+                <th>Model</th>
+                <th>Age</th>
+                <th>Risk</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="devicesTable"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/devices.js"></script>
+</body>
+</html>

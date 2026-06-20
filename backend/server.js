@@ -41,13 +41,14 @@ app.get("*", (_req, res) => {
 async function start() {
   try {
     await connectMongoDB();
-    app.listen(PORT, () => {
-      console.log(`[Server] MedTrack running at http://localhost:${PORT}`);
-    });
+    console.log("[Server] MongoDB connected");
   } catch (err) {
-    console.error("[Server] Failed to start:", err.message);
-    process.exit(1);
+    console.warn("[Server] MongoDB unavailable — NoSQL routes will not work:", err.message);
   }
+
+  app.listen(PORT, () => {
+    console.log(`[Server] MedTrack running at http://localhost:${PORT}`);
+  });
 }
 
 start();

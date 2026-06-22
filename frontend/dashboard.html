@@ -25,43 +25,118 @@
   <main class="page">
     <div class="page-heading">
       <div>
-        <p class="eyebrow">Overview</p>
-        <h1>Dashboard</h1>
+        <p class="eyebrow">Dashboard Intelligence</p>
+        <h1>Operational Overview</h1>
+        <p class="page-subtitle">
+          Live summary of device reliability, unresolved failures, maintenance progress,
+          and predictive risk ranking.
+        </p>
       </div>
+
       <button class="btn secondary" id="refreshDashboardBtn">Refresh</button>
     </div>
 
     <section class="status-banner" id="dashboardStatus">Loading dashboard data...</section>
 
     <section class="kpi-grid" id="kpiGrid">
-      <article class="kpi-card"><span>Total Devices</span><strong id="totalDevices">-</strong></article>
-      <article class="kpi-card warning"><span>Unresolved Failures</span><strong id="unresolvedFailures">-</strong></article>
-      <article class="kpi-card danger"><span>High-Risk Devices</span><strong id="highRiskDevices">-</strong></article>
-      <article class="kpi-card success"><span>Completed Maintenance</span><strong id="completedMaintenance">-</strong></article>
-      <article class="kpi-card"><span>Avg. Maintenance Cost</span><strong id="avgMaintenanceCost">-</strong></article>
+      <article class="kpi-card">
+        <span>Total Device Fleet</span>
+        <strong id="totalDevices">-</strong>
+      </article>
+
+      <article class="kpi-card warning">
+        <span>Open Failure Cases</span>
+        <strong id="unresolvedFailures">-</strong>
+      </article>
+
+      <article class="kpi-card danger">
+        <span>Current High-Risk Devices</span>
+        <strong id="highRiskDevices">-</strong>
+      </article>
+
+      <article class="kpi-card success">
+        <span>Completed Maintenance</span>
+        <strong id="completedMaintenance">-</strong>
+      </article>
+
+      <article class="kpi-card">
+        <span>Avg. Maintenance Cost</span>
+        <strong id="avgMaintenanceCost">-</strong>
+      </article>
     </section>
 
     <section class="grid two">
       <article class="panel">
         <div class="panel-header">
-          <h2>Failure Summary by Device Type</h2>
+          <div>
+            <p class="eyebrow">Failure Analytics</p>
+            <h2>Failure Summary by Device Type</h2>
+          </div>
         </div>
+
         <div id="failureSummaryBars" class="bar-list"></div>
       </article>
 
       <article class="panel">
         <div class="panel-header">
-          <h2>High-Risk Devices</h2>
+          <div>
+            <p class="eyebrow">Current Risk Status</p>
+            <h2>High-Risk Devices</h2>
+          </div>
         </div>
+
         <div class="table-wrap small-table">
           <table>
             <thead>
-              <tr><th>Device</th><th>Type</th><th>Risk</th></tr>
+              <tr>
+                <th>Device</th>
+                <th>Type</th>
+                <th>Risk</th>
+              </tr>
             </thead>
             <tbody id="highRiskTable"></tbody>
           </table>
         </div>
       </article>
+    </section>
+
+    <section class="panel risk-ranking-panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Additional Feature</p>
+          <h2>Top High-Risk Device Ranking</h2>
+          <p class="panel-description">
+            Devices are ranked using the MySQL risk scoring view. The score considers
+            failure count, downtime, maintenance frequency, cost, device age, severity,
+            priority, and current risk status.
+          </p>
+        </div>
+
+        <button class="btn primary" id="syncRiskAlertsBtn">Sync MongoDB Alerts</button>
+      </div>
+
+      <section class="status-banner compact-status" id="alertSyncStatus">
+        MongoDB alert history will be created for the highest-risk devices when synced.
+      </section>
+
+      <div class="table-wrap risk-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Device</th>
+              <th>Type</th>
+              <th>Failure Count</th>
+              <th>Downtime</th>
+              <th>Priority</th>
+              <th>Risk Score</th>
+              <th>Predicted Level</th>
+              <th>Recommended Action</th>
+            </tr>
+          </thead>
+          <tbody id="riskRankingTable"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 

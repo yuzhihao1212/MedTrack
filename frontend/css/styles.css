@@ -944,3 +944,815 @@ tbody tr:hover {
     min-height: auto;
   }
 }
+
+/* =========================================================
+   MedTrack Product Homepage Upgrade
+   Paste this at the bottom of styles.css
+   ========================================================= */
+
+.landing-hero {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  padding: 88px 5vw;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(246, 248, 252, 0.98) 0%,
+      rgba(246, 248, 252, 0.9) 42%,
+      rgba(246, 248, 252, 0.44) 72%,
+      rgba(246, 248, 252, 0.16) 100%
+    ),
+    url("../assets/mainheader.png");
+  background-size: cover;
+  background-position: center right;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-overlay {
+  max-width: 800px;
+}
+
+.landing-hero h1 {
+  margin: 0 0 24px;
+  color: var(--navy);
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.95;
+  font-weight: 550;
+  letter-spacing: -0.075em;
+}
+
+.landing-hero .hero-text {
+  max-width: 730px;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+  line-height: 1.72;
+}
+
+.landing-hero .hero-actions {
+  margin-top: 34px;
+}
+
+.section-heading {
+  max-width: 980px;
+  margin-bottom: 38px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(2.1rem, 4vw, 3.8rem);
+  line-height: 1.08;
+  font-weight: 550;
+  letter-spacing: -0.055em;
+}
+
+/* Platform Stats */
+
+.stats-section {
+  margin-top: 76px;
+  margin-bottom: 72px;
+}
+
+.product-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stat-card {
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.stat-card span {
+  display: block;
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.stat-card strong {
+  display: block;
+  margin: 14px 0 10px;
+  color: var(--navy);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.stat-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* Product Feature Cards */
+
+.corporate-section {
+  margin-top: 72px;
+  margin-bottom: 72px;
+}
+
+.corporate-section h2 {
+  max-width: 980px;
+  margin: 0 0 42px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.08;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  color: var(--navy);
+}
+
+.feature-showcase {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.feature-tile {
+  display: flex;
+  flex-direction: column;
+  min-height: 450px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: var(--shadow);
+  transition: 0.25s ease;
+}
+
+.feature-tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 55px rgba(23, 37, 54, 0.16);
+}
+
+.feature-visual {
+  height: 230px;
+  overflow: hidden;
+  background: #eef3fb;
+}
+
+.feature-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: 0.35s ease;
+}
+
+.feature-tile:hover .feature-image {
+  transform: scale(1.04);
+}
+
+.feature-content {
+  flex: 1;
+  padding: 32px 32px 26px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.feature-content h3 {
+  margin: 0 0 16px;
+  color: white;
+  font-size: 1.58rem;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
+}
+
+.feature-content p {
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.65;
+  margin: 0 0 36px;
+}
+
+.feature-content span {
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.tile-navy .feature-content {
+  background: #02084f;
+}
+
+.tile-teal .feature-content {
+  background: #006b68;
+}
+
+.tile-purple .feature-content {
+  background: #6123a8;
+}
+
+/* Workflow */
+
+.workflow-section {
+  margin-top: 72px;
+  margin-bottom: 72px;
+}
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.workflow-step {
+  padding: 30px;
+  min-height: 250px;
+  border-right: 1px solid var(--line);
+}
+
+.workflow-step:last-child {
+  border-right: 0;
+}
+
+.workflow-step span {
+  display: inline-flex;
+  margin-bottom: 28px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.workflow-step h3 {
+  margin: 0 0 14px;
+  color: var(--navy);
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.workflow-step p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* Advanced Feature */
+
+.advanced-section {
+  margin-top: 72px;
+  margin-bottom: 80px;
+}
+
+.advanced-card {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 42px;
+  align-items: center;
+  padding: 48px;
+  color: white;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 34%),
+    linear-gradient(135deg, #02084f 0%, #0b3a9a 58%, #172536 100%);
+  box-shadow: 0 26px 70px rgba(2, 8, 79, 0.22);
+}
+
+.advanced-card .eyebrow {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.advanced-card h2 {
+  margin: 0 0 18px;
+  color: white;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1.05;
+  font-weight: 550;
+  letter-spacing: -0.055em;
+}
+
+.advanced-card p {
+  margin: 0;
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.75;
+  font-size: 1.05rem;
+}
+
+.advanced-points {
+  display: grid;
+  gap: 14px;
+}
+
+.advanced-points span {
+  display: block;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 800;
+}
+
+/* Footer */
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 34px 5vw;
+  color: rgba(255, 255, 255, 0.78);
+  background: var(--navy);
+}
+
+.site-footer strong {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.site-footer p {
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.55;
+}
+
+.site-footer span {
+  align-self: flex-end;
+  font-weight: 700;
+}
+
+/* Mobile */
+
+@media (max-width: 980px) {
+  .landing-hero {
+    min-height: auto;
+    padding: 72px 6vw;
+    background:
+      linear-gradient(
+        rgba(246, 248, 252, 0.94),
+        rgba(246, 248, 252, 0.94)
+      ),
+      url("../assets/mainheader.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .product-stats,
+  .feature-showcase,
+  .workflow-grid,
+  .advanced-card {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-tile {
+    min-height: auto;
+  }
+
+  .workflow-step {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .workflow-step:last-child {
+    border-bottom: 0;
+  }
+
+  .site-footer {
+    flex-direction: column;
+  }
+
+  .site-footer span {
+    align-self: flex-start;
+  }
+}
+
+/* =========================================================
+   MedTrack Subtle Product Animations
+   ========================================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-overlay {
+  animation: fadeUp 0.9s ease both;
+}
+
+.stat-card,
+.feature-tile,
+.workflow-step,
+.advanced-card {
+  animation: fadeUp 0.8s ease both;
+}
+
+.stat-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 0.19s;
+}
+
+.stat-card:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+.btn {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.feature-tile {
+  will-change: transform;
+}
+
+.feature-tile:hover {
+  transform: translateY(-8px);
+}
+
+.feature-tile:hover .feature-image {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.stats-section {
+  margin-top: 56px;
+}
+
+.stats-heading {
+  margin-bottom: 28px;
+  max-width: 860px;
+}
+
+.stats-heading h2 {
+  margin: 10px 0 0;
+  font-size: clamp(2.2rem, 5vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.07em;
+  color: var(--text);
+}
+
+.stats-layout {
+  display: grid;
+  grid-template-columns: 430px 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.two-card-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 38px 36px;
+  box-shadow: var(--shadow);
+}
+
+.stat-card span {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+}
+
+.stat-card strong {
+  display: block;
+  font-size: clamp(3.2rem, 6vw, 5.1rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.stats-diagram {
+  min-height: 100%;
+}
+
+.insight-diagram {
+  position: relative;
+  min-height: 520px;
+  border-radius: 34px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(36, 107, 254, 0.10), transparent 25%),
+    radial-gradient(circle at 80% 25%, rgba(36, 107, 254, 0.08), transparent 24%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7fd 100%);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.diagram-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 290px;
+  height: 290px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(36, 107, 254, 0.12);
+  box-shadow: 0 18px 50px rgba(24, 42, 73, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 34px;
+  z-index: 3;
+}
+
+.core-label {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+}
+
+.diagram-core h3 {
+  margin: 0 0 12px;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.diagram-core p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.diagram-node {
+  position: absolute;
+  width: 215px;
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(36, 107, 254, 0.12);
+  box-shadow: 0 10px 28px rgba(22, 34, 61, 0.08);
+  z-index: 3;
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+.diagram-node small {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+}
+
+.diagram-node strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.diagram-node p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.node-top-left {
+  top: 44px;
+  left: 28px;
+  animation-delay: 0s;
+}
+
+.node-bottom-left {
+  bottom: 40px;
+  left: 36px;
+  animation-delay: 0.8s;
+}
+
+.node-top-right {
+  top: 52px;
+  right: 32px;
+  animation-delay: 0.4s;
+}
+
+.node-bottom-right {
+  bottom: 48px;
+  right: 28px;
+  animation-delay: 1.2s;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(36, 107, 254, 0.18);
+  z-index: 1;
+}
+
+.ring-1 {
+  width: 360px;
+  height: 360px;
+  animation: pulseRing 3s ease-in-out infinite;
+}
+
+.ring-2 {
+  width: 450px;
+  height: 450px;
+  animation: pulseRing 3s ease-in-out infinite 1s;
+}
+
+.connector {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(36, 107, 254, 0.05),
+    rgba(36, 107, 254, 0.9),
+    rgba(36, 107, 254, 0.05)
+  );
+  background-size: 200% 100%;
+  animation: flowLine 2.6s linear infinite;
+  z-index: 2;
+}
+
+.connector::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12%;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 8px rgba(36, 107, 254, 0.10);
+}
+
+.connector-1 {
+  top: 160px;
+  left: 180px;
+  width: 180px;
+  transform: rotate(18deg);
+}
+
+.connector-2 {
+  bottom: 155px;
+  left: 195px;
+  width: 170px;
+  transform: rotate(-15deg);
+}
+
+.connector-3 {
+  top: 175px;
+  right: 185px;
+  width: 170px;
+  transform: rotate(-18deg);
+}
+
+.connector-4 {
+  bottom: 170px;
+  right: 185px;
+  width: 160px;
+  transform: rotate(16deg);
+}
+
+@keyframes pulseRing {
+  0% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@keyframes flowLine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes floatCard {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .stats-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-diagram {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .stats-heading h2 {
+    font-size: 2.4rem;
+  }
+
+  .insight-diagram {
+    min-height: 760px;
+    padding: 20px;
+  }
+
+  .diagram-core {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 220px auto 0;
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    border-radius: 28px;
+    padding: 28px 24px;
+  }
+
+  .diagram-node {
+    position: relative;
+    width: 100%;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    margin-bottom: 14px;
+  }
+
+  .node-top-left,
+  .node-top-right,
+  .node-bottom-left,
+  .node-bottom-right {
+    position: relative;
+  }
+
+  .pulse-ring,
+  .connector {
+    display: none;
+  }
+}

@@ -8,7 +8,10 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="index.html"><span class="brand-mark">M</span> MedTrack</a>
+    <a class="brand" href="index.html" aria-label="MedTrack Home">
+      <img src="assets/medtrack.png" alt="MedTrack Logo" class="brand-logo" />
+    </a>
+
     <nav class="nav-links">
       <a href="dashboard.html">Dashboard</a>
       <a href="devices.html">Devices</a>
@@ -18,33 +21,72 @@
     </nav>
   </header>
 
-  <main class="page hero-page">
-    <section class="hero-card">
-      <p class="eyebrow">Hybrid SQL + NoSQL Database System</p>
-      <h1>Medical Device Failure and Maintenance Monitoring</h1>
-      <p class="hero-text">
-        MedTrack helps organise medical device records, monitor failure patterns,
-        track maintenance work, and identify high-risk devices using MySQL and MongoDB.
-      </p>
-      <div class="hero-actions">
-        <a class="btn primary" href="dashboard.html">Open Dashboard</a>
-        <a class="btn secondary" href="devices.html">Manage Devices</a>
+  <main>
+    <section class="landing-hero">
+      <div class="hero-overlay">
+        <p class="eyebrow">MedTrack Database Intelligence Platform</p>
+
+        <h1>Intelligent device monitoring for modern healthcare operations.</h1>
+
+        <p class="hero-text">
+            MedTrack brings device records, failure reports, maintenance activity, and operational logs
+            into one connected platform, helping healthcare teams identify high-risk equipment and plan
+            maintenance with greater confidence.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="dashboard.html">Open Dashboard</a>
+          <a class="btn secondary" href="logs.html">View NoSQL Logs</a>
+        </div>
       </div>
     </section>
 
-    <section class="grid three">
-      <article class="info-card">
-        <h3>MySQL</h3>
-        <p>Stores structured device, failure, maintenance, technician, parts, and user records.</p>
-      </article>
-      <article class="info-card">
-        <h3>MongoDB</h3>
-        <p>Stores flexible technician notes, event logs, sensor snapshots, alert history, and audit logs.</p>
-      </article>
-      <article class="info-card">
-        <h3>Express API</h3>
-        <p>Connects the frontend to both databases through REST API routes.</p>
-      </article>
+    <section class="page corporate-section">
+      <h2>One platform for medical device reliability</h2>
+
+      <div class="feature-showcase">
+        <a class="feature-tile tile-navy" href="dashboard.html">
+          <div class="feature-visual">
+            <img src="assets/performance.png" alt="Dashboard analytics" class="feature-image" />
+          </div>
+
+          <div class="feature-content">
+            <div>
+              <h3>Monitor device performance</h3>
+              <p>Track high-risk devices, failures, maintenance cost, and dashboard analytics.</p>
+            </div>
+            <span>View Dashboard</span>
+          </div>
+        </a>
+
+        <a class="feature-tile tile-teal" href="devices.html">
+          <div class="feature-visual">
+            <img src="assets/storage.png" alt="Medical device management" class="feature-image" />
+          </div>
+
+          <div class="feature-content">
+            <div>
+              <h3>Manage medical devices</h3>
+              <p>Store structured device, manufacturer, failure, and maintenance records in MySQL.</p>
+            </div>
+            <span>Manage Devices</span>
+          </div>
+        </a>
+
+        <a class="feature-tile tile-purple" href="logs.html">
+          <div class="feature-visual">
+            <img src="assets/logs.png" alt="NoSQL logs and technician notes" class="feature-image" />
+          </div>
+
+          <div class="feature-content">
+            <div>
+              <h3>Capture operational logs</h3>
+              <p>Store technician notes, event logs, alerts, snapshots, and audit history in MongoDB.</p>
+            </div>
+            <span>View NoSQL Logs</span>
+          </div>
+        </a>
+      </div>
     </section>
   </main>
 </body>

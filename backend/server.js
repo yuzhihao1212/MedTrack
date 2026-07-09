@@ -4,6 +4,7 @@ const cors    = require("cors");
 const path    = require("path");
 
 const { connectMongoDB } = require("./config/mongodb");
+const { authenticate } = require("./middleware/auth");
 
 // Route imports
 const authRouter        = require("./routes/auth");
@@ -23,18 +24,19 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // ─── Routes ─────────────────────────────────────────────────
-app.use("/api/auth",        authRouter);
+// Health check
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+app.use("/api/auth", authRouter);
+app.use("/api", authenticate);
 app.use("/api/logs",        logsRouter);
 app.use("/api/devices",     devicesRouter);
 app.use("/api/failures",    failuresRouter);
 app.use("/api/maintenance", maintenanceRouter);
 app.use("/api/dashboard",   dashboardRouter);
 app.use("/api/olap",        olapRouter);
-
-// Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
 
 // Catch-all: serve frontend for SPA navigation
 app.get("*", (_req, res) => {
@@ -44,7 +46,7 @@ app.get("*", (_req, res) => {
 // ─── Startup ─────────────────────────────────────────────────
 async function start() {
   if (!process.env.JWT_SECRET) {
-    console.warn("[Server] JWT_SECRET is not set — auth routes will fail. Add it to backend/.env");
+    console.warn("[Server] JWT_SECRET is not set; using the local development fallback. Add it to backend/.env before deployment.");
   }
 
   try {

@@ -367,6 +367,46 @@ async function syncRiskAlerts() {
   }
 }
 
+function setupDashboardQuickNav() {
+  const links = [...document.querySelectorAll("[data-section-link]")];
+
+  if (!links.length) return;
+
+  const sections = links
+    .map(link => document.getElementById(link.dataset.sectionLink))
+    .filter(Boolean);
+
+  function setActive(sectionId) {
+    links.forEach(link => {
+      link.classList.toggle("active", link.dataset.sectionLink === sectionId);
+    });
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    links.forEach(link => {
+      link.addEventListener("click", () => setActive(link.dataset.sectionLink));
+    });
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    const visibleEntry = entries
+      .filter(entry => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (visibleEntry) {
+      setActive(visibleEntry.target.id);
+    }
+  }, {
+    rootMargin: "-24% 0px -58% 0px",
+    threshold: [0.08, 0.18, 0.32]
+  });
+
+  sections.forEach(section => observer.observe(section));
+}
+
+setupDashboardQuickNav();
+
 document.getElementById("refreshDashboardBtn").addEventListener("click", loadDashboard);
 document.getElementById("syncRiskAlertsBtn").addEventListener("click", syncRiskAlerts);
 

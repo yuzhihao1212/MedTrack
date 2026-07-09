@@ -151,7 +151,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/devices
 // create device
-router.post("/", authenticate, authorize("admin", "technician"), async (req, res) => {
+router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
   const {
     device_code,
     device_type_id,
@@ -218,7 +218,7 @@ router.post("/", authenticate, authorize("admin", "technician"), async (req, res
 
 // PUT /api/devices/:id
 // update device
-router.put("/:id", authenticate, authorize("admin", "technician"), async (req, res) => {
+router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
   // validate before fetch device by id
   try {
     const idError = validatePositiveId(req.params.id, "device_id");
@@ -301,7 +301,7 @@ router.put("/:id", authenticate, authorize("admin", "technician"), async (req, r
 
 // DELETE /api/devices/:id
 // delete device and dependencies
-router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
   //validate id before get connection
   const idError = validatePositiveId(req.params.id, "device_id");
 

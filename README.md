@@ -144,23 +144,26 @@ MedTrack enforces access control at two independent layers:
 **Application layer (JWT):** `POST /api/auth/login` verifies credentials against
 the `users` table (bcrypt-hashed passwords) and issues a signed JWT carrying
 the user's role. `backend/middleware/auth.js` provides `authenticate`
-(validates the token) and `authorize(...roles)` (checks the role), applied to
-every mutating route:
+(validates the token) and `authorize(...roles)` (checks the role). All app
+pages and data API routes require a login; write/delete routes also check
+role privileges:
 
 | Role | Read (GET) | Create / Update | Delete |
 | --- | --- | --- | --- |
-| *(no login)* | ✅ | ❌ | ❌ |
-| `viewer` | ✅ | ❌ | ❌ |
-| `technician` | ✅ | ✅ | ❌ |
-| `admin` | ✅ | ✅ | ✅ |
+| *(no login)* | ❌ | ❌ | ❌ |
+| `bme_analyst` | ✅ | ❌ | ❌ |
+| `bme_engineer` | ✅ | ✅ | ❌ |
+| `bme_manager` | ✅ | ✅ | ✅ |
+| `bme_admin` | ✅ | ✅ | ✅ |
 
-Reads stay public (matching the "guest" access level from the course's
-application/security design stage); only writes require a token.
+Unauthenticated users are redirected to the login page and cannot access
+dashboard, device, failure, maintenance, log, or OLAP API data.
 
 **Database layer (DCL):** `database/sql/roles_grants.sql` creates matching
-MySQL/MariaDB roles (`medtrack_viewer`, `medtrack_technician`,
-`medtrack_admin`) with `GRANT`/`REVOKE` privileges scoped table-by-table —
-e.g. `medtrack_technician` is never granted any privilege on `users`, and
+MySQL/MariaDB roles (`medtrack_bme_analyst`, `medtrack_bme_engineer`,
+`medtrack_bme_manager`, `medtrack_bme_admin`) with `GRANT`/`REVOKE`
+privileges scoped table-by-table — e.g. `medtrack_bme_engineer` is never
+granted any privilege on `users`, and
 never granted `DELETE` anywhere. This is a standalone demonstration of DCL
 and is not currently wired into the live connection pool (the app still
 connects with the single `MYSQL_USER` from `.env`); see the comments at the
@@ -170,9 +173,10 @@ Demo accounts (seeded by `database/sql/seed_users.sql`, dev only):
 
 | Username | Password | Role |
 | --- | --- | --- |
-| `admin01` | `Admin@123` | admin |
-| `tech01` | `Tech@123` | technician |
-| `viewer01` | `Viewer@123` | viewer |
+| `bme_admin01` | `BmeAdmin@123` | bme_admin |
+| `bme_manager01` | `BmeManager@123` | bme_manager |
+| `bme_engineer01` | `BmeEngineer@123` | bme_engineer |
+| `bme_analyst01` | `BmeAnalyst@123` | bme_analyst |
 
 ---
 
@@ -479,29 +483,24 @@ brew services list
 
 ---
 
-### 6. Create MySQL schema
+### 6. Initialise the database
+
+Run the initializer from the project root:
 
 ```bash
-mysql -u root < database/sql/schema.sql
-mysql -u root medtrack < database/sql/views.sql
-mysql -u root medtrack < database/sql/indexes.sql
-mysql -u root medtrack < database/sql/triggers.sql
-mysql -u root medtrack < database/sql/seed_users.sql
+bash init-database.sh
 ```
 
-If your MySQL uses a password, use:
+The script creates the MySQL schema, applies the BME RBAC migration, seeds
+the four default accounts, creates views/indexes/triggers, loads the cleaned
+dataset into MySQL and MongoDB, then builds the OLAP warehouse.
+
+If you only want the schema and default accounts without loading the CSV or
+MongoDB data:
 
 ```bash
-mysql -u root -p < database/sql/schema.sql
-mysql -u root -p medtrack < database/sql/views.sql
-mysql -u root -p medtrack < database/sql/indexes.sql
-mysql -u root -p medtrack < database/sql/triggers.sql
-mysql -u root -p medtrack < database/sql/seed_users.sql
+SKIP_DATA_LOAD=1 bash init-database.sh
 ```
-
-`seed_users.sql` seeds the login accounts (see section 7 above) and is
-required regardless of whether you load device data via `seed.sql` or the
-real dataset loader below — neither of those touches the `users` table.
 
 Optional: apply the DB-level DCL roles/grants demonstration:
 
@@ -511,25 +510,7 @@ mysql -u root medtrack < database/sql/roles_grants.sql
 
 ---
 
-### 7. Load the dataset
-
-```bash
-node -r dotenv/config database/loader.js
-```
-
-After the dataset is loaded, build the OLAP warehouse:
-
-```bash
-mysql -u root medtrack < database/sql/olap_warehouse.sql
-```
-
-If your MySQL uses a password:
-
-```bash
-mysql -u root -p medtrack < database/sql/olap_warehouse.sql
-```
-
-Optional B+ tree index demonstration:
+### 7. Optional B+ tree index demonstration
 
 ```bash
 mysql -u root medtrack < database/sql/btree_index_demo.sql
@@ -603,7 +584,7 @@ GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
 ```
 
-The frontend communicates with these API routes to retrieve and update system data. All `POST`/`PUT`/`PATCH`/`DELETE` routes on `/api/devices`, `/api/failures`, `/api/maintenance`, and `/api/logs` require an `Authorization: Bearer <token>` header from `/api/auth/login` (technician or admin to write, admin only to delete) — see section 7 above.
+The frontend communicates with these API routes to retrieve and update system data. All data routes require an `Authorization: Bearer <token>` header from `/api/auth/login`. `POST`/`PUT`/`PATCH` routes require `bme_engineer`, `bme_manager`, or `bme_admin`; delete routes require `bme_manager` or `bme_admin` — see section 7 above.
 
 ---
 

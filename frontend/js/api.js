@@ -1,4 +1,43 @@
 const API_BASE = window.location.protocol === "file:" ? "http://localhost:3000" : "";
+const AUTH_TOKEN_KEY = "medtrack_auth_token";
+const AUTH_USER_KEY = "medtrack_auth_user";
+const LEGACY_AUTH_KEY = "medtrack_auth";
+
+function getAuthToken() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  if (token) return token;
+
+  try {
+    const auth = JSON.parse(localStorage.getItem(LEGACY_AUTH_KEY) || "null");
+    return auth?.token || null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function getAuthUser() {
+  const raw = localStorage.getItem(AUTH_USER_KEY);
+  try {
+    if (raw) return JSON.parse(raw);
+
+    const auth = JSON.parse(localStorage.getItem(LEGACY_AUTH_KEY) || "null");
+    return auth?.user || null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function setStoredAuth(token, user) {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  localStorage.setItem(LEGACY_AUTH_KEY, JSON.stringify({ token, user }));
+}
+
+function clearStoredAuth() {
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(LEGACY_AUTH_KEY);
+}
 
 async function apiRequest(path, options = {}) {
   let token = null;
@@ -24,7 +63,10 @@ async function apiRequest(path, options = {}) {
     : { success: response.ok, message: await response.text() };
 
   if (response.status === 401 && token) {
-    localStorage.removeItem("medtrack_auth");
+    clearStoredAuth();
+    if (!window.location.pathname.endsWith("login.html")) {
+      window.location.replace("login.html");
+    }
   }
 
   if (!response.ok || payload.success === false) {

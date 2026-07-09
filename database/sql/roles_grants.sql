@@ -5,7 +5,9 @@ USE medtrack;
 -- backend/middleware/auth.js — the three roles below map 1:1 to the
 -- `users.role` values ('viewer', 'technician', 'admin').
 --
--- Requires MySQL 8.0+ (role support). Safe to re-run.
+-- Requires MySQL 8.0+ or MariaDB 10.4+ (role support). Written and verified
+-- against MariaDB 12.2 — this project's actual DB engine, despite the
+-- "MySQL" naming throughout the rest of the codebase. Safe to re-run.
 
 -- ── Roles (privilege templates) ────────────────────────────────────────────
 

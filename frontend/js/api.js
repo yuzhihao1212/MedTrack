@@ -1,8 +1,13 @@
 const API_BASE = window.location.protocol === "file:" ? "http://localhost:3000" : "";
 
 async function apiRequest(path, options = {}) {
-  const stored = localStorage.getItem("medtrack_auth");
-  const token = stored ? JSON.parse(stored).token : null;
+  let token = null;
+  try {
+    const stored = localStorage.getItem("medtrack_auth");
+    token = stored ? JSON.parse(stored).token : null;
+  } catch (error) {
+    localStorage.removeItem("medtrack_auth");
+  }
 
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {

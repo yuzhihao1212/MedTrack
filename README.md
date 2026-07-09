@@ -123,7 +123,7 @@ MedTrack includes an additional database optimisation and analytics layer.
 * MySQL/InnoDB B+ tree indexes support faster filtering, joins, sorting, and dashboard lookups.
 * OLTP tables continue to support CRUD operations for devices, failures, and maintenance.
 * OLAP warehouse tables use a star schema with fact and dimension tables for analytical reporting.
-* The dashboard includes an OLAP section showing warehouse KPIs, maintenance cost drilldowns, and index coverage.
+* The dashboard includes an OLAP section showing warehouse KPIs, maintenance cost bar charts, failure trend line graphs, a risk-priority matrix, and index coverage.
 
 Main OLAP tables:
 
@@ -267,6 +267,7 @@ The backend exposes OLAP endpoints under:
 GET /api/olap/summary
 GET /api/olap/maintenance-cost
 GET /api/olap/failure-cube
+GET /api/olap/failure-trend
 GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
 ```
@@ -537,6 +538,7 @@ GET /api/logs
 GET /api/olap/summary
 GET /api/olap/maintenance-cost
 GET /api/olap/failure-cube
+GET /api/olap/failure-trend
 GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
 ```

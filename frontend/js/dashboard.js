@@ -105,9 +105,11 @@ async function loadOlapDashboard() {
   setStatus("olapDashboardStatus", "Loading OLAP warehouse data...");
 
   try {
-    const [summary, maintenanceCost, btreeIndexes] = await Promise.all([
+    const [summary, maintenanceCost, failureTrend, riskMatrix, btreeIndexes] = await Promise.all([
       apiRequest("/api/olap/summary"),
       apiRequest("/api/olap/maintenance-cost?limit=8"),
+      apiRequest("/api/olap/failure-trend"),
+      apiRequest("/api/olap/risk-matrix"),
       apiRequest("/api/olap/btree-indexes")
     ]);
 
@@ -117,6 +119,9 @@ async function loadOlapDashboard() {
     document.getElementById("warehouseMaintenanceCost").textContent = formatMoney(summary.total_maintenance_cost);
 
     renderOlapCostTable(maintenanceCost || []);
+    renderOlapCostBars(maintenanceCost || []);
+    renderFailureTrendChart(failureTrend || []);
+    renderRiskMatrixChart(riskMatrix || []);
     renderBtreeIndexTable(btreeIndexes?.tables || {});
 
     setStatus(
@@ -125,9 +130,20 @@ async function loadOlapDashboard() {
     );
   } catch (error) {
     renderOlapCostTable([]);
+    renderOlapCostBars([]);
+    renderFailureTrendChart([]);
+    renderRiskMatrixChart([]);
     renderBtreeIndexTable({});
     setStatus("olapDashboardStatus", error.message, "error");
   }
+}
+
+function formatCompactNumber(value) {
+  const number = Number(value || 0);
+
+  if (number >= 1000000) return `${(number / 1000000).toFixed(1)}M`;
+  if (number >= 1000) return `${(number / 1000).toFixed(1)}K`;
+  return String(Math.round(number));
 }
 
 function renderOlapCostTable(rows) {
@@ -146,6 +162,148 @@ function renderOlapCostTable(rows) {
       <td>${formatMoney(row.total_maintenance_cost)}</td>
     </tr>
   `).join("");
+}
+
+function renderOlapCostBars(rows) {
+  const chart = document.getElementById("olapCostBars");
+
+  if (!rows.length) {
+    chart.innerHTML = `<p class="muted">No OLAP cost chart available.</p>`;
+    return;
+  }
+
+  const maxCost = Math.max(...rows.map(row => Number(row.total_maintenance_cost || 0)), 1);
+
+  chart.innerHTML = rows.slice(0, 6).map(row => {
+    const totalCost = Number(row.total_maintenance_cost || 0);
+    const width = Math.max((totalCost / maxCost) * 100, 3);
+
+    return `
+      <div class="chart-row">
+        <div class="chart-row-label">
+          <strong>${row.manufacturer_name || "-"}</strong>
+          <span>${row.type_name || "-"}</span>
+        </div>
+        <div class="chart-bar-track" aria-label="${formatMoney(totalCost)}">
+          <div class="chart-bar-fill" style="width:${width}%"></div>
+        </div>
+        <span class="chart-value">${formatCompactNumber(totalCost)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderFailureTrendChart(rows) {
+  const chart = document.getElementById("failureTrendChart");
+
+  if (!rows.length) {
+    chart.innerHTML = `<p class="muted">No failure trend data available.</p>`;
+    return;
+  }
+
+  const trendMap = new Map();
+
+  rows.forEach(row => {
+    const year = Number(row.year_number);
+    const quarter = Number(row.quarter_number);
+
+    if (!year || !quarter) return;
+
+    const key = `${year} Q${quarter}`;
+    const existing = trendMap.get(key) || {
+      label: key,
+      sort: year * 10 + quarter,
+      total: 0
+    };
+
+    existing.total += Number(row.total_failure_events || 0);
+    trendMap.set(key, existing);
+  });
+
+  const points = [...trendMap.values()]
+    .sort((a, b) => a.sort - b.sort)
+    .slice(-10);
+
+  if (!points.length) {
+    chart.innerHTML = `<p class="muted">No failure trend data available.</p>`;
+    return;
+  }
+
+  const width = 640;
+  const height = 260;
+  const padding = 34;
+  const maxValue = Math.max(...points.map(point => point.total), 1);
+  const step = points.length > 1 ? (width - padding * 2) / (points.length - 1) : 0;
+
+  const coordinates = points.map((point, index) => {
+    const x = points.length > 1 ? padding + index * step : width / 2;
+    const y = height - padding - (point.total / maxValue) * (height - padding * 2);
+    return { ...point, x, y };
+  });
+
+  const path = coordinates
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`)
+    .join(" ");
+
+  const areaPath = `${path} L ${coordinates[coordinates.length - 1].x.toFixed(1)} ${height - padding} L ${coordinates[0].x.toFixed(1)} ${height - padding} Z`;
+
+  chart.innerHTML = `
+    <svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Failure trend line graph">
+      <line class="axis-line" x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}"></line>
+      <line class="axis-line" x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}"></line>
+      <path class="trend-area" d="${areaPath}"></path>
+      <path class="trend-line" d="${path}"></path>
+      ${coordinates.map(point => `
+        <g>
+          <circle class="trend-dot" cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="5"></circle>
+          <text class="trend-value" x="${point.x.toFixed(1)}" y="${Math.max(point.y - 12, 18).toFixed(1)}">${point.total}</text>
+        </g>
+      `).join("")}
+      ${coordinates.map((point, index) => index % 2 === 0 || index === coordinates.length - 1 ? `
+        <text class="trend-label" x="${point.x.toFixed(1)}" y="${height - 8}">${point.label}</text>
+      ` : "").join("")}
+    </svg>
+  `;
+}
+
+function renderRiskMatrixChart(rows) {
+  const chart = document.getElementById("riskMatrixChart");
+
+  if (!rows.length) {
+    chart.innerHTML = `<p class="muted">No risk matrix data available.</p>`;
+    return;
+  }
+
+  const riskLevels = ["Critical", "High", "Medium", "Low"];
+  const priorities = ["Critical", "High", "Medium", "Low"];
+  const matrix = new Map();
+  const maxCost = Math.max(...rows.map(row => Number(row.total_maintenance_cost || 0)), 1);
+
+  rows.forEach(row => {
+    matrix.set(`${row.risk_status}:${row.maintenance_priority}`, row);
+  });
+
+  chart.innerHTML = `
+    <div class="matrix-grid">
+      <div class="matrix-corner"></div>
+      ${priorities.map(priority => `<div class="matrix-heading">${priority}</div>`).join("")}
+      ${riskLevels.map(risk => `
+        <div class="matrix-heading row-heading">${risk}</div>
+        ${priorities.map(priority => {
+          const row = matrix.get(`${risk}:${priority}`);
+          const totalCost = Number(row?.total_maintenance_cost || 0);
+          const intensity = Math.max(totalCost / maxCost, 0.08);
+
+          return `
+            <div class="matrix-cell" style="--heat:${intensity.toFixed(2)}">
+              <strong>${formatCompactNumber(totalCost)}</strong>
+              <span>${row?.devices ?? 0} devices</span>
+            </div>
+          `;
+        }).join("")}
+      `).join("")}
+    </div>
+  `;
 }
 
 function renderBtreeIndexTable(tables) {

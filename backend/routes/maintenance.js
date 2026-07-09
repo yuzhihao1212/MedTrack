@@ -1,7 +1,6 @@
 const express = require("express");
 const pool = require("../config/mysql");
 const { success, created, badRequest, notFound, conflict, serverError } = require("../utils/apiResponse");
-const { requireRole } = require("../middleware/auth");
 const {
   requireFields,
   validatePositiveId,
@@ -253,7 +252,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/maintenance
 // create maintenance record
-router.post("/", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/", authenticate, authorize("admin", "technician"), async (req, res) => {
   const {
     device_id,
     technician_id = null,
@@ -321,7 +320,7 @@ router.post("/", requireRole("bme_admin", "bme_manager", "bme_engineer"), async 
 
 // PUT /api/maintenance/:id
 // update maintenance record
-router.put("/:id", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:id", authenticate, authorize("admin", "technician"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "maintenance_id");
 
@@ -410,7 +409,7 @@ router.put("/:id", requireRole("bme_admin", "bme_manager", "bme_engineer"), asyn
 
 // PATCH /api/maintenance/:id/status
 // update maintenance status
-router.patch("/:id/status", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.patch("/:id/status", authenticate, authorize("admin", "technician"), async (req, res) => {
   const { repair_status } = req.body;
   const idError = validatePositiveId(req.params.id, "maintenance_id");
   if (idError) {
@@ -447,7 +446,7 @@ router.patch("/:id/status", requireRole("bme_admin", "bme_manager", "bme_enginee
 
 // POST /api/maintenance/:id/parts
 // add maintenance part
-router.post("/:id/parts", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/:id/parts", authenticate, authorize("admin", "technician"), async (req, res) => {
   const maintenanceId = req.params.id;
   const { part_id, quantity_used = 1 } = req.body;
 
@@ -506,7 +505,7 @@ router.post("/:id/parts", requireRole("bme_admin", "bme_manager", "bme_engineer"
 
 // PUT /api/maintenance/:maintenanceId/parts/:partId
 // update maintenance part
-router.put("/:maintenanceId/parts/:partId", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:maintenanceId/parts/:partId", authenticate, authorize("admin", "technician"), async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const { quantity_used = 1 } = req.body;
 
@@ -556,7 +555,7 @@ router.put("/:maintenanceId/parts/:partId", requireRole("bme_admin", "bme_manage
 
 // DELETE /api/maintenance/:id
 // delete maintenance record and dependencies
-router.delete("/:id", requireRole("bme_admin"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   const idError = validatePositiveId(req.params.id, "maintenance_id");
   if (idError) {
     return badRequest(res, idError);
@@ -586,7 +585,7 @@ router.delete("/:id", requireRole("bme_admin"), async (req, res) => {
 
 // DELETE /api/maintenance/:maintenanceId/parts/:partId
 // delete maintenance part
-router.delete("/:maintenanceId/parts/:partId", requireRole("bme_admin"), async (req, res) => {
+router.delete("/:maintenanceId/parts/:partId", authenticate, authorize("admin"), async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const maintenanceIdError = validatePositiveId(maintenanceId, "maintenance_id");
 

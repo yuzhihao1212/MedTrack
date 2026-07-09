@@ -1,7 +1,6 @@
 const express = require("express");
 const pool = require("../config/mysql");
 const { success, created, badRequest, notFound, serverError, conflict } = require("../utils/apiResponse");
-const { requireRole } = require("../middleware/auth");
 const {
   requireFields,
   validatePositiveId,
@@ -152,7 +151,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/devices
 // create device
-router.post("/", requireRole("bme_admin"), async (req, res) => {
+router.post("/", authenticate, authorize("admin", "technician"), async (req, res) => {
   const {
     device_code,
     device_type_id,
@@ -219,7 +218,7 @@ router.post("/", requireRole("bme_admin"), async (req, res) => {
 
 // PUT /api/devices/:id
 // update device
-router.put("/:id", requireRole("bme_admin"), async (req, res) => {
+router.put("/:id", authenticate, authorize("admin", "technician"), async (req, res) => {
   // validate before fetch device by id
   try {
     const idError = validatePositiveId(req.params.id, "device_id");
@@ -302,7 +301,7 @@ router.put("/:id", requireRole("bme_admin"), async (req, res) => {
 
 // DELETE /api/devices/:id
 // delete device and dependencies
-router.delete("/:id", requireRole("bme_admin"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   //validate id before get connection
   const idError = validatePositiveId(req.params.id, "device_id");
 

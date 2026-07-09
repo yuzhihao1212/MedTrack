@@ -29,6 +29,7 @@
 const express = require("express");
 const router = express.Router();
 const { success, created, badRequest, notFound, serverError } = require("../utils/apiResponse");
+const { requireRole } = require("../middleware/auth");
 const {
   requireFields,
   validateField,
@@ -71,7 +72,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/logs
-router.post("/", async (req, res) => {
+router.post("/", requireRole("admin", "technician"), async (req, res) => {
   try {
     const { device_code, event_type, severity, event_message, metadata } = req.body;
     const missing = requireFields(req.body, [
@@ -114,7 +115,7 @@ router.get("/notes", async (req, res) => {
 });
 
 // POST /api/logs/notes
-router.post("/notes", async (req, res) => {
+router.post("/notes", requireRole("admin", "technician"), async (req, res) => {
   try {
     const { device_code, technician_name, note } = req.body;
     const missing = requireFields(req.body, [
@@ -135,7 +136,7 @@ router.post("/notes", async (req, res) => {
 });
 
 // PUT /api/logs/notes/:id
-router.put("/notes/:id", async (req, res) => {
+router.put("/notes/:id", requireRole("admin", "technician"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -150,7 +151,7 @@ router.put("/notes/:id", async (req, res) => {
 });
 
 // DELETE /api/logs/notes/:id
-router.delete("/notes/:id", async (req, res) => {
+router.delete("/notes/:id", requireRole("admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -181,7 +182,7 @@ router.get("/snapshots", async (req, res) => {
 });
 
 // POST /api/logs/snapshots
-router.post("/snapshots", async (req, res) => {
+router.post("/snapshots", requireRole("admin", "technician"), async (req, res) => {
   try {
     const { device_code, device_type, readings } = req.body;
     const missing = requireFields(req.body, [
@@ -205,7 +206,7 @@ router.post("/snapshots", async (req, res) => {
 });
 
 // PUT /api/logs/snapshots/:id
-router.put("/snapshots/:id", async (req, res) => {
+router.put("/snapshots/:id", requireRole("admin", "technician"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -225,7 +226,7 @@ router.put("/snapshots/:id", async (req, res) => {
 });
 
 // DELETE /api/logs/snapshots/:id
-router.delete("/snapshots/:id", async (req, res) => {
+router.delete("/snapshots/:id", requireRole("admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -256,7 +257,7 @@ router.get("/alerts", async (req, res) => {
 });
 
 // POST /api/logs/alerts
-router.post("/alerts", async (req, res) => {
+router.post("/alerts", requireRole("admin", "technician"), async (req, res) => {
   try {
     const { device_code, alert_type, risk_status, alert_message } = req.body;
     const missing = requireFields(req.body, [
@@ -281,7 +282,7 @@ router.post("/alerts", async (req, res) => {
 });
 
 // PATCH /api/logs/alerts/:id/resolve
-router.patch("/alerts/:id/resolve", async (req, res) => {
+router.patch("/alerts/:id/resolve", requireRole("admin", "technician"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -297,7 +298,7 @@ router.patch("/alerts/:id/resolve", async (req, res) => {
 });
 
 // DELETE /api/logs/alerts/:id
-router.delete("/alerts/:id", async (req, res) => {
+router.delete("/alerts/:id", requireRole("admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -314,7 +315,7 @@ router.delete("/alerts/:id", async (req, res) => {
 // ─── AUDIT LOGS ─────────────────────────────────────────────
 
 // GET /api/logs/audit
-router.get("/audit", async (req, res) => {
+router.get("/audit", requireRole("admin"), async (req, res) => {
   try {
     const filter = {};
     if (req.query.username) filter.username = req.query.username;
@@ -328,7 +329,7 @@ router.get("/audit", async (req, res) => {
 
 //moved down
 // PUT /api/logs/:id
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireRole("admin", "technician"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -343,7 +344,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE /api/logs/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireRole("admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }

@@ -4,8 +4,10 @@ const cors    = require("cors");
 const path    = require("path");
 
 const { connectMongoDB } = require("./config/mongodb");
+const { optionalAuth } = require("./middleware/auth");
 
 // Route imports
+const authRouter        = require("./routes/auth");
 const logsRouter        = require("./routes/logs");
 const devicesRouter     = require("./routes/devices");
 const failuresRouter    = require("./routes/failures");
@@ -19,9 +21,11 @@ const PORT = process.env.PORT || 3000;
 // ─── Middleware ──────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+app.use(optionalAuth);
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // ─── Routes ─────────────────────────────────────────────────
+app.use("/api/auth",        authRouter);
 app.use("/api/logs",        logsRouter);
 app.use("/api/devices",     devicesRouter);
 app.use("/api/failures",    failuresRouter);

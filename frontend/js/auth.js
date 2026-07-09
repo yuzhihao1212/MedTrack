@@ -32,7 +32,7 @@ function renderAuthBar() {
 
   if (auth) {
     bar.innerHTML = `
-      <span class="auth-user">${auth.user.username} ${badge(auth.user.role)}</span>
+      <span class="auth-user">Privileges ${badge(auth.user.role)}</span>
       <button class="btn secondary" id="authLogoutBtn" type="button">Log out</button>
     `;
     topbar.appendChild(bar);

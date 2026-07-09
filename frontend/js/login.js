@@ -13,7 +13,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
     });
 
     setAuth(token, user);
-    window.location.href = "dashboard.html";
+    window.location.href = "index.html";
   } catch (error) {
     setStatus("loginStatus", error.message, "error");
   }

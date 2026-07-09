@@ -39,6 +39,16 @@ function logout() {
   window.location.href = "login.html";
 }
 
+function roleLabel(role) {
+  const labels = {
+    bme_admin: "Admin",
+    bme_manager: "Manager",
+    bme_engineer: "Engineer",
+    bme_analyst: "Analyst"
+  };
+  return labels[role] || role;
+}
+
 function requireLogin() {
   const auth = getAuth();
   const page = currentPageName();
@@ -73,7 +83,7 @@ function renderAuthBar() {
 
   if (auth) {
     bar.innerHTML = `
-      <span class="auth-user">Privileges ${badge(auth.user.role)}</span>
+      <span class="auth-user">Privileges ${badge(roleLabel(auth.user.role))}</span>
       <button class="btn secondary" id="authLogoutBtn" type="button">Log out</button>
     `;
     topbar.appendChild(bar);

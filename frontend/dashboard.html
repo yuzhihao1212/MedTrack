@@ -22,50 +22,96 @@
   </nav>
 </header>
 
-  <main class="page">
-    <div class="page-heading">
-      <div>
-        <p class="eyebrow">Dashboard Intelligence</p>
-        <h1>Operational Overview</h1>
-        <p class="page-subtitle">
-          Live summary of device reliability, unresolved failures, maintenance progress,
-          and predictive risk ranking.
-        </p>
+  <main class="page dashboard-page">
+    <div class="dashboard-layout">
+      <aside class="dashboard-quick-nav" aria-label="Dashboard quick navigation">
+        <p class="eyebrow">Quick Navigation</p>
+        <nav>
+          <a class="active" href="#overview" data-section-link="overview">
+            <span class="nav-dot"></span>
+            <span>Overview</span>
+          </a>
+          <a href="#failure-section" data-section-link="failure-section">
+            <span class="nav-dot"></span>
+            <span>Failures</span>
+          </a>
+          <a href="#risk-ranking" data-section-link="risk-ranking">
+            <span class="nav-dot"></span>
+            <span>Risk Ranking</span>
+          </a>
+          <a href="#olap-analytics" data-section-link="olap-analytics">
+            <span class="nav-dot"></span>
+            <span>OLAP Analytics</span>
+          </a>
+          <a href="#btree-indexes" data-section-link="btree-indexes">
+            <span class="nav-dot"></span>
+            <span>B+ Tree Indexes</span>
+          </a>
+        </nav>
+      </aside>
+
+      <div class="dashboard-content">
+        <section class="dashboard-section dashboard-section-shell section-overview" id="overview">
+          <div class="section-title">
+            <span class="section-number">01</span>
+            <div>
+              <p class="eyebrow">Operational Snapshot</p>
+              <h2>Live System Status</h2>
+            </div>
+          </div>
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">Dashboard Intelligence</p>
+              <h1>Operational Overview</h1>
+              <p class="page-subtitle">
+                Live summary of device reliability, unresolved failures, maintenance progress,
+                and predictive risk ranking.
+              </p>
+            </div>
+
+            <button class="btn secondary" id="refreshDashboardBtn">Refresh</button>
+          </div>
+
+          <section class="status-banner" id="dashboardStatus">Loading dashboard data...</section>
+
+          <section class="kpi-grid" id="kpiGrid">
+            <article class="kpi-card">
+              <span>Total Device Fleet</span>
+              <strong id="totalDevices">-</strong>
+            </article>
+
+            <article class="kpi-card warning">
+              <span>Open Failure Cases</span>
+              <strong id="unresolvedFailures">-</strong>
+            </article>
+
+            <article class="kpi-card danger">
+              <span>Current High-Risk Devices</span>
+              <strong id="highRiskDevices">-</strong>
+            </article>
+
+            <article class="kpi-card success">
+              <span>Completed Maintenance</span>
+              <strong id="completedMaintenance">-</strong>
+            </article>
+
+            <article class="kpi-card">
+              <span>Avg. Maintenance Cost</span>
+              <strong id="avgMaintenanceCost">-</strong>
+            </article>
+          </section>
+        </section>
+
+    <section class="grid two dashboard-section dashboard-section-shell section-failures" id="failure-section">
+      <div class="section-title section-title-wide">
+        <span class="section-number">02</span>
+        <div>
+          <p class="eyebrow">Failure Monitoring</p>
+          <h2>Device Failure and Risk Signals</h2>
+        </div>
       </div>
 
-      <button class="btn secondary" id="refreshDashboardBtn">Refresh</button>
-    </div>
-
-    <section class="status-banner" id="dashboardStatus">Loading dashboard data...</section>
-
-    <section class="kpi-grid" id="kpiGrid">
-      <article class="kpi-card">
-        <span>Total Device Fleet</span>
-        <strong id="totalDevices">-</strong>
-      </article>
-
-      <article class="kpi-card warning">
-        <span>Open Failure Cases</span>
-        <strong id="unresolvedFailures">-</strong>
-      </article>
-
-      <article class="kpi-card danger">
-        <span>Current High-Risk Devices</span>
-        <strong id="highRiskDevices">-</strong>
-      </article>
-
-      <article class="kpi-card success">
-        <span>Completed Maintenance</span>
-        <strong id="completedMaintenance">-</strong>
-      </article>
-
-      <article class="kpi-card">
-        <span>Avg. Maintenance Cost</span>
-        <strong id="avgMaintenanceCost">-</strong>
-      </article>
-    </section>
-
-    <section class="grid two">
       <article class="panel">
         <div class="panel-header">
           <div>
@@ -100,7 +146,15 @@
       </article>
     </section>
 
-    <section class="panel risk-ranking-panel">
+    <section class="panel risk-ranking-panel dashboard-section dashboard-section-shell section-risk" id="risk-ranking">
+      <div class="section-title">
+        <span class="section-number">03</span>
+        <div>
+          <p class="eyebrow">Predictive Risk</p>
+          <h2>Priority Devices for Review</h2>
+        </div>
+      </div>
+
       <div class="panel-header">
         <div>
           <p class="eyebrow">Additional Feature</p>
@@ -139,7 +193,15 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel dashboard-section dashboard-section-shell section-olap" id="olap-analytics">
+      <div class="section-title">
+        <span class="section-number">04</span>
+        <div>
+          <p class="eyebrow">Warehouse Analytics</p>
+          <h2>OLAP Decision Support</h2>
+        </div>
+      </div>
+
       <div class="panel-header">
         <div>
           <p class="eyebrow">OLAP + B+ Tree Indexing</p>
@@ -238,7 +300,15 @@
           </div>
         </article>
 
-        <article>
+        <article id="btree-indexes" class="dashboard-section index-panel">
+          <div class="section-title mini-section-title">
+            <span class="section-number">05</span>
+            <div>
+              <p class="eyebrow">Performance Layer</p>
+              <h3>B+ Tree Access Paths</h3>
+            </div>
+          </div>
+
           <div class="panel-header table-section-header">
             <div>
               <h3>B+ Tree Index Coverage</h3>
@@ -261,6 +331,8 @@
         </article>
       </section>
     </section>
+      </div>
+    </div>
   </main>
 
   <script src="js/api.js"></script>

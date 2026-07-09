@@ -1,9 +1,13 @@
 const API_BASE = window.location.protocol === "file:" ? "http://localhost:3000" : "";
 
 async function apiRequest(path, options = {}) {
+  const stored = localStorage.getItem("medtrack_auth");
+  const token = stored ? JSON.parse(stored).token : null;
+
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {})
     },
     ...options
@@ -13,6 +17,10 @@ async function apiRequest(path, options = {}) {
   const payload = contentType.includes("application/json")
     ? await response.json()
     : { success: response.ok, message: await response.text() };
+
+  if (response.status === 401 && token) {
+    localStorage.removeItem("medtrack_auth");
+  }
 
   if (!response.ok || payload.success === false) {
     throw new Error(payload.message || payload.details || "API request failed");

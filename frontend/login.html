@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Log in</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="MedTrack Home">
+    <img src="assets/medtrack.png" alt="MedTrack Logo" class="brand-logo" />
+  </a>
+
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="devices.html">Devices</a>
+    <a href="failures.html">Failures</a>
+    <a href="maintenance.html">Maintenance</a>
+    <a href="logs.html">Logs</a>
+  </nav>
+</header>
+
+  <main class="page login-page">
+    <section class="grid form-layout">
+      <article class="panel login-panel">
+        <p class="eyebrow">RBAC Demo</p>
+        <h1>Log in to MedTrack</h1>
+        <p class="muted">
+          Read access is open to everyone. Creating, editing, or deleting
+          records requires a technician or admin account.
+        </p>
+
+        <form id="loginForm" class="form-grid">
+          <label>Username
+            <input id="loginUsername" type="text" autocomplete="username" required />
+          </label>
+
+          <label>Password
+            <input id="loginPassword" type="password" autocomplete="current-password" required />
+          </label>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit">Log in</button>
+          </div>
+        </form>
+
+        <p class="muted" id="loginStatus"></p>
+
+        <div class="login-demo-accounts">
+          <p class="eyebrow">Demo accounts (dev only)</p>
+          <ul>
+            <li><strong>admin01</strong> / Admin@123 — full access, including delete</li>
+            <li><strong>tech01</strong> / Tech@123 — create/update, no delete</li>
+            <li><strong>viewer01</strong> / Viewer@123 — read-only</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

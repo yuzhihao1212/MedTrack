@@ -2555,3 +2555,64 @@ th {
 .login-panel .muted {
   margin-bottom: 20px;
 }
+
+/* Roll-up table (WITH ROLLUP subtotal/grand-total rows) */
+
+.rollup-table-wrap tr.rollup-subtotal td {
+  background: var(--surface-soft);
+  font-weight: 700;
+}
+
+.rollup-table-wrap tr.rollup-grand-total td {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 800;
+  border-top: 2px solid var(--primary);
+}
+
+/* Star vs snowflake schema comparison */
+
+.schema-comparison-summary {
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.schema-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.schema-comparison-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.schema-comparison-card h4 {
+  margin: 0 0 4px;
+  color: var(--navy);
+}
+
+.schema-plan-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.schema-plan-list li {
+  margin-bottom: 4px;
+}
+
+.schema-comparison-footnote {
+  margin-top: 14px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .schema-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}

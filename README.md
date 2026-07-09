@@ -135,6 +135,10 @@ Main OLAP tables:
 
 This allows B+ tree indexing and OLAP analytics to co-exist meaningfully: indexes speed up operational and warehouse queries, while the warehouse supports aggregated reporting.
 
+**Roll-up (`database/sql/rollup_analysis.sql`, run after `olap_warehouse.sql`)**: `dw_maintenance_cost_rollup_view` and `dw_failure_rollup_view` use `GROUP BY ... WITH ROLLUP` to compute detail, subtotal, and grand-total rows in a single query (manufacturer → device type → grand total; year → quarter → grand total). Exposed via `GET /api/olap/maintenance-cost-rollup` and `GET /api/olap/failure-rollup`, and shown on the dashboard with subtotal/grand-total rows visually highlighted. Note: this MariaDB build doesn't support `GROUPING()`, and a compound `col IS NULL AND col2 IS NOT NULL` expression over rolled-up columns evaluates incorrectly here — so the detail/subtotal/grand-total classification is done in `backend/routes/olap.js`, not in SQL.
+
+**Snowflake variant (`database/sql/snowflake_variant.sql`, run after `olap_warehouse.sql`)**: normalises the star schema's flattened `dw_dim_device` (which embeds `manufacturer_name`/`type_name` as text) into `dw_dim_manufacturer`, `dw_dim_device_type`, and `dw_dim_device_snowflake` (FK references instead of embedded text). `dw_dim_device_snowflake_view` reconstructs the same flattened shape via joins and is verified to return identical data to the star schema (0 mismatches across all rows). Exposed via `GET /api/olap/schema-comparison`, which also returns `EXPLAIN` plans showing the star schema resolves the query against 1 table vs. 3 for the snowflake join — shown side-by-side on the dashboard.
+
 ---
 
 ### 7. Authentication and Role-Based Access Control (RBAC)
@@ -313,6 +317,9 @@ GET /api/olap/failure-cube
 GET /api/olap/failure-trend
 GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
+GET /api/olap/maintenance-cost-rollup
+GET /api/olap/failure-rollup
+GET /api/olap/schema-comparison
 ```
 
 ---
@@ -516,6 +523,15 @@ mysql -u root medtrack < database/sql/roles_grants.sql
 mysql -u root medtrack < database/sql/btree_index_demo.sql
 ```
 
+### 7b. Roll-up analysis and snowflake schema variant
+
+```bash
+mysql -u root medtrack < database/sql/rollup_analysis.sql
+mysql -u root medtrack < database/sql/snowflake_variant.sql
+```
+
+Both must run after `olap_warehouse.sql` (they read from `dw_dim_device` / `dw_fact_maintenance` / `dw_fact_failure`). See section 6 above for what each adds.
+
 After loading, verify the records:
 
 ```bash
@@ -582,6 +598,9 @@ GET /api/olap/failure-cube
 GET /api/olap/failure-trend
 GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
+GET /api/olap/maintenance-cost-rollup
+GET /api/olap/failure-rollup
+GET /api/olap/schema-comparison
 ```
 
 The frontend communicates with these API routes to retrieve and update system data. All data routes require an `Authorization: Bearer <token>` header from `/api/auth/login`. `POST`/`PUT`/`PATCH` routes require `bme_engineer`, `bme_manager`, or `bme_admin`; delete routes require `bme_manager` or `bme_admin` — see section 7 above.

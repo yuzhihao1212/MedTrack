@@ -9,6 +9,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
   try {
     const { token, user } = await apiRequest("/api/auth/login", {
       method: "POST",
+      skipAuth: true,
       body: JSON.stringify({ username, password })
     });
 

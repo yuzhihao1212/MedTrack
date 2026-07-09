@@ -144,19 +144,20 @@ MedTrack enforces access control at two independent layers:
 **Application layer (JWT):** `POST /api/auth/login` verifies credentials against
 the `users` table (bcrypt-hashed passwords) and issues a signed JWT carrying
 the user's role. `backend/middleware/auth.js` provides `authenticate`
-(validates the token) and `authorize(...roles)` (checks the role), applied to
-every mutating route:
+(validates the token) and `authorize(...roles)` (checks the role). All app
+pages and data API routes require a login; write/delete routes also check
+role privileges:
 
 | Role | Read (GET) | Create / Update | Delete |
 | --- | --- | --- | --- |
-| *(no login)* | ✅ | ❌ | ❌ |
+| *(no login)* | ❌ | ❌ | ❌ |
 | `bme_analyst` | ✅ | ❌ | ❌ |
 | `bme_engineer` | ✅ | ✅ | ❌ |
 | `bme_manager` | ✅ | ✅ | ✅ |
 | `bme_admin` | ✅ | ✅ | ✅ |
 
-Reads stay public (matching the "guest" access level from the course's
-application/security design stage); only writes require a token.
+Unauthenticated users are redirected to the login page and cannot access
+dashboard, device, failure, maintenance, log, or OLAP API data.
 
 **Database layer (DCL):** `database/sql/roles_grants.sql` creates matching
 MySQL/MariaDB roles (`medtrack_bme_analyst`, `medtrack_bme_engineer`,
@@ -487,7 +488,7 @@ brew services list
 Run the initializer from the project root:
 
 ```bash
-bash database/init-database.sh
+bash init-database.sh
 ```
 
 The script creates the MySQL schema, applies the BME RBAC migration, seeds
@@ -498,7 +499,7 @@ If you only want the schema and default accounts without loading the CSV or
 MongoDB data:
 
 ```bash
-SKIP_DATA_LOAD=1 bash database/init-database.sh
+SKIP_DATA_LOAD=1 bash init-database.sh
 ```
 
 Optional: apply the DB-level DCL roles/grants demonstration:
@@ -583,7 +584,7 @@ GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
 ```
 
-The frontend communicates with these API routes to retrieve and update system data. All `POST`/`PUT`/`PATCH`/`DELETE` routes on `/api/devices`, `/api/failures`, `/api/maintenance`, and `/api/logs` require an `Authorization: Bearer <token>` header from `/api/auth/login` (`bme_engineer`, `bme_manager`, or `bme_admin` to write; `bme_manager` or `bme_admin` to delete) — see section 7 above.
+The frontend communicates with these API routes to retrieve and update system data. All data routes require an `Authorization: Bearer <token>` header from `/api/auth/login`. `POST`/`PUT`/`PATCH` routes require `bme_engineer`, `bme_manager`, or `bme_admin`; delete routes require `bme_manager` or `bme_admin` — see section 7 above.
 
 ---
 

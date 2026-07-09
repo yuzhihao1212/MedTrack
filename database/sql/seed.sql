@@ -1,9 +1,10 @@
 USE medtrack;
 
 INSERT INTO users (username, password_hash, role) VALUES
-('admin01', 'hashed_password_1', 'admin'),
-('tech01', 'hashed_password_2', 'technician'),
-('viewer01', 'hashed_password_3', 'viewer');
+('bme_admin01', 'hashed_password_1', 'bme_admin'),
+('bme_manager01', 'hashed_password_2', 'bme_manager'),
+('bme_engineer01', 'hashed_password_3', 'bme_engineer'),
+('bme_analyst01', 'hashed_password_4', 'bme_analyst');
 
 INSERT INTO manufacturers (manufacturer_name) VALUES
 ('Medtronic'),

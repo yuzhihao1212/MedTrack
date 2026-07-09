@@ -8,9 +8,10 @@ const { requireAuth } = require("../middleware/auth");
 const router = express.Router();
 
 const DEMO_PASSWORDS = {
-  admin01: "admin123",
-  tech01: "tech123",
-  viewer01: "viewer123"
+  bme_admin01: "admin123",
+  bme_manager01: "manager123",
+  bme_engineer01: "engineer123",
+  bme_analyst01: "analyst123"
 };
 
 function isValidDemoPassword(user, password) {

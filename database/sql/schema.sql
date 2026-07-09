@@ -15,7 +15,7 @@ CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'technician', 'viewer') NOT NULL,
+    role ENUM('bme_admin', 'bme_manager', 'bme_engineer', 'bme_analyst') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

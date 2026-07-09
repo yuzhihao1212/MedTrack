@@ -83,7 +83,7 @@ router.get("/risk-ranking", async (req, res) => {
 
 // POST /api/dashboard/risk-alerts/sync
 // Create MongoDB alert history records for top high-risk devices
-router.post("/risk-alerts/sync", requireRole("admin", "technician"), async (req, res) => {
+router.post("/risk-alerts/sync", requireRole("bme_admin", "bme_manager"), async (req, res) => {
   try {
     const limit = Math.min(Number(req.body?.limit) || 10, 25);
 

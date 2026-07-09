@@ -33,28 +33,6 @@ router.post("/login", async (req, res) => {
     );
 
     const user = rows[0];
-<<<<<<< HEAD
-    const passwordMatches = user ? await verifyPassword(password, user.password_hash) : false;
-
-    if (!user || !passwordMatches) {
-      return error(res, 401, "Invalid username or password");
-    }
-
-    const token = signToken(user);
-
-    success(res, {
-      token,
-      user: { user_id: user.user_id, username: user.username, role: user.role }
-    }, "Login successful");
-  } catch (err) {
-    error(res, 500, "Failed to log in", err.message);
-  }
-});
-
-// GET /api/auth/me
-router.get("/me", authenticate, (req, res) => {
-  success(res, req.user);
-=======
     if (!user || !isValidDemoPassword(user, password)) {
       return error(res, 401, "Invalid username or password");
     }
@@ -76,7 +54,6 @@ router.get("/me", authenticate, (req, res) => {
 
 router.get("/me", requireAuth, (req, res) => {
   success(res, { user: req.user });
->>>>>>> origin
 });
 
 module.exports = router;

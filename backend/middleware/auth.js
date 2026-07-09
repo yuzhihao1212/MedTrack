@@ -28,19 +28,11 @@ function requireRole(...allowedRoles) {
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-<<<<<<< HEAD
-      return error(res, 403, `Requires role: ${allowedRoles.join(" or ")}`);
-=======
       return error(res, 403, "Insufficient role permission");
->>>>>>> origin
     }
 
     next();
   };
 }
 
-<<<<<<< HEAD
-module.exports = { authenticate, authorize };
-=======
 module.exports = { optionalAuth, requireAuth, requireRole };
->>>>>>> origin

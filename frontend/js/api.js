@@ -87,7 +87,7 @@ function renderAuthWidget() {
   widget.innerHTML = `
     <form id="loginForm" class="auth-form">
       <input id="loginUsername" type="text" placeholder="bme_admin01" autocomplete="username" />
-      <input id="loginPassword" type="password" placeholder="admin123" autocomplete="current-password" />
+      <input id="loginPassword" type="password" placeholder="BmeAdmin@123" autocomplete="current-password" />
       <button class="btn primary compact" type="submit">Login</button>
       <span id="loginStatus"></span>
     </form>

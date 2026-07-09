@@ -2,10 +2,11 @@ async function loadDashboard() {
   setStatus("dashboardStatus", "Loading dashboard data...");
 
   try {
-    const [summary, failureSummary, highRiskDevices] = await Promise.all([
+    const [summary, failureSummary, highRiskDevices, riskRanking] = await Promise.all([
       apiRequest("/api/dashboard"),
       apiRequest("/api/failures/summary"),
-      apiRequest("/api/devices/high-risk")
+      apiRequest("/api/devices/high-risk"),
+      apiRequest("/api/dashboard/risk-ranking?limit=10")
     ]);
 
     document.getElementById("totalDevices").textContent = summary.total_devices ?? 0;
@@ -16,6 +17,8 @@ async function loadDashboard() {
 
     renderFailureBars(failureSummary || []);
     renderHighRiskTable((highRiskDevices || []).slice(0, 8));
+    renderRiskRankingTable(riskRanking || []);
+
     setStatus("dashboardStatus", "Dashboard loaded successfully.");
   } catch (error) {
     setStatus("dashboardStatus", error.message, "error");
@@ -65,5 +68,64 @@ function renderHighRiskTable(rows) {
   `).join("");
 }
 
+function renderRiskRankingTable(rows) {
+  const table = document.getElementById("riskRankingTable");
+
+  if (!rows.length) {
+    table.innerHTML = `<tr><td colspan="9">No predictive risk ranking available. Run the MySQL views script first.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = rows.map((row, index) => {
+    const rankClass = index < 3 ? "rank-pill top-rank" : "rank-pill";
+    const downtime = Number(row.downtime_hours || 0).toFixed(2);
+    const riskScore = Number(row.risk_score || 0).toFixed(2);
+
+    return `
+      <tr>
+        <td><span class="${rankClass}">#${index + 1}</span></td>
+        <td>
+          <strong>${row.device_code}</strong>
+          <small class="table-subtext">${row.manufacturer_name || ""}</small>
+        </td>
+        <td>${row.type_name || "-"}</td>
+        <td>${row.failure_event_count ?? 0}</td>
+        <td>${downtime} hrs</td>
+        <td>${badge(row.maintenance_priority || "-")}</td>
+        <td><strong>${riskScore}</strong></td>
+        <td>${badge(row.predicted_risk_level || "-")}</td>
+        <td>${row.recommended_action || "-"}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+async function syncRiskAlerts() {
+  const button = document.getElementById("syncRiskAlertsBtn");
+
+  try {
+    button.disabled = true;
+    button.textContent = "Syncing...";
+    setStatus("alertSyncStatus", "Creating MongoDB alert history records for top high-risk devices...");
+
+    const result = await apiRequest("/api/dashboard/risk-alerts/sync", {
+      method: "POST",
+      body: JSON.stringify({ limit: 10 })
+    });
+
+    setStatus(
+      "alertSyncStatus",
+      `MongoDB alert sync completed. Created: ${result.created_alerts}, skipped existing: ${result.skipped_existing_alerts}.`
+    );
+  } catch (error) {
+    setStatus("alertSyncStatus", error.message, "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Sync MongoDB Alerts";
+  }
+}
+
 document.getElementById("refreshDashboardBtn").addEventListener("click", loadDashboard);
+document.getElementById("syncRiskAlertsBtn").addEventListener("click", syncRiskAlerts);
+
 loadDashboard();

@@ -110,6 +110,29 @@ router.get("/failure-cube", async (req, res) => {
   }
 });
 
+// GET /api/olap/failure-trend
+// Time-series rollup for line chart visualisation.
+router.get("/failure-trend", async (_req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT
+        dt.year_number,
+        dt.quarter_number,
+        COUNT(ff.failure_key) AS failure_reports,
+        SUM(ff.failure_event_count) AS total_failure_events,
+        ROUND(SUM(ff.downtime_hours), 2) AS total_downtime_hours
+      FROM dw_fact_failure ff
+      JOIN dw_dim_date dt ON dt.date_key = ff.date_key
+      GROUP BY dt.year_number, dt.quarter_number
+      ORDER BY dt.year_number ASC, dt.quarter_number ASC`
+    );
+
+    success(res, rows);
+  } catch (error) {
+    handleOlapError(res, "Failed to load OLAP failure trend", error);
+  }
+});
+
 // GET /api/olap/risk-matrix
 // Cross-analysis between device risk, maintenance priority, failures, downtime, and cost.
 router.get("/risk-matrix", async (_req, res) => {

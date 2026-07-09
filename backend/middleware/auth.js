@@ -1,37 +1,46 @@
-const { verifyToken } = require("../utils/auth");
 const { error } = require("../utils/apiResponse");
+const { verifyToken } = require("../utils/token");
 
-// Verifies the Bearer token and attaches { user_id, username, role } to req.user.
-// Does not itself restrict by role — combine with authorize() for that.
-function authenticate(req, res, next) {
+function optionalAuth(req, _res, next) {
   const header = req.headers.authorization || "";
   const [scheme, token] = header.split(" ");
 
-  if (scheme !== "Bearer" || !token) {
+  if (scheme === "Bearer" && token) {
+    const user = verifyToken(token);
+    if (user) req.user = user;
+  }
+
+  next();
+}
+
+function requireAuth(req, res, next) {
+  if (!req.user) {
     return error(res, 401, "Authentication required");
   }
 
-  try {
-    req.user = verifyToken(token);
-    next();
-  } catch (err) {
-    return error(res, 401, "Invalid or expired token");
-  }
+  next();
 }
 
-// Must run after authenticate(). Rejects if req.user.role is not one of allowedRoles.
-function authorize(...allowedRoles) {
+function requireRole(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user) {
       return error(res, 401, "Authentication required");
     }
 
     if (!allowedRoles.includes(req.user.role)) {
+<<<<<<< HEAD
       return error(res, 403, `Requires role: ${allowedRoles.join(" or ")}`);
+=======
+      return error(res, 403, "Insufficient role permission");
+>>>>>>> origin
     }
 
     next();
   };
 }
 
+<<<<<<< HEAD
 module.exports = { authenticate, authorize };
+=======
+module.exports = { optionalAuth, requireAuth, requireRole };
+>>>>>>> origin

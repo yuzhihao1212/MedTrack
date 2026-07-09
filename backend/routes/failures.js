@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../config/mysql");
 const { success, created, badRequest, notFound, serverError } = require("../utils/apiResponse");
+const { requireRole } = require("../middleware/auth");
 const {
   requireFields,
   validatePositiveId,
@@ -113,7 +114,7 @@ router.get("/above-average-devices", async (req, res) => {
 
 // POST /api/failures
 // create failure record
-router.post("/", authenticate, authorize("admin", "technician"), async (req, res) => {
+router.post("/", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
   const {
     device_id,
     failure_event_count = 0,
@@ -167,7 +168,7 @@ router.post("/", authenticate, authorize("admin", "technician"), async (req, res
 
 // PUT /api/failures/:id
 // update failure record
-router.put("/:id", authenticate, authorize("admin", "technician"), async (req, res) => {
+router.put("/:id", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "failure_id");
 
@@ -244,7 +245,7 @@ router.put("/:id", authenticate, authorize("admin", "technician"), async (req, r
 
 // PATCH /api/failures/:id/status
 // update failure report status
-router.patch("/:id/status", authenticate, authorize("admin", "technician"), async (req, res) => {
+router.patch("/:id/status", requireRole("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
   const { report_status } = req.body;
   const idError = validatePositiveId(req.params.id, "failure_id");
 
@@ -303,7 +304,7 @@ router.get("/:id", async (req, res) => {
 
 // DELETE /api/failures/:id
 // delete failure record
-router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
+router.delete("/:id", requireRole("bme_admin"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "failure_id");
 

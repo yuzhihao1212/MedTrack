@@ -18,6 +18,7 @@ async function loadDashboard() {
     renderFailureBars(failureSummary || []);
     renderHighRiskTable((highRiskDevices || []).slice(0, 8));
     renderRiskRankingTable(riskRanking || []);
+    await loadOlapDashboard();
 
     setStatus("dashboardStatus", "Dashboard loaded successfully.");
   } catch (error) {
@@ -98,6 +99,89 @@ function renderRiskRankingTable(rows) {
       </tr>
     `;
   }).join("");
+}
+
+async function loadOlapDashboard() {
+  setStatus("olapDashboardStatus", "Loading OLAP warehouse data...");
+
+  try {
+    const [summary, maintenanceCost, btreeIndexes] = await Promise.all([
+      apiRequest("/api/olap/summary"),
+      apiRequest("/api/olap/maintenance-cost?limit=8"),
+      apiRequest("/api/olap/btree-indexes")
+    ]);
+
+    document.getElementById("warehouseDevices").textContent = summary.warehouse_devices ?? 0;
+    document.getElementById("failureFactRows").textContent = summary.failure_fact_rows ?? 0;
+    document.getElementById("maintenanceFactRows").textContent = summary.maintenance_fact_rows ?? 0;
+    document.getElementById("warehouseMaintenanceCost").textContent = formatMoney(summary.total_maintenance_cost);
+
+    renderOlapCostTable(maintenanceCost || []);
+    renderBtreeIndexTable(btreeIndexes?.tables || {});
+
+    setStatus(
+      "olapDashboardStatus",
+      "OLAP warehouse loaded. B+ tree index metadata is available for OLTP and warehouse tables."
+    );
+  } catch (error) {
+    renderOlapCostTable([]);
+    renderBtreeIndexTable({});
+    setStatus("olapDashboardStatus", error.message, "error");
+  }
+}
+
+function renderOlapCostTable(rows) {
+  const table = document.getElementById("olapCostTable");
+
+  if (!rows.length) {
+    table.innerHTML = `<tr><td colspan="4">No OLAP cost summary available.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = rows.map(row => `
+    <tr>
+      <td>${row.manufacturer_name || "-"}</td>
+      <td>${row.type_name || "-"}</td>
+      <td>${row.maintenance_records ?? 0}</td>
+      <td>${formatMoney(row.total_maintenance_cost)}</td>
+    </tr>
+  `).join("");
+}
+
+function renderBtreeIndexTable(tables) {
+  const table = document.getElementById("btreeIndexTable");
+  const groupedIndexes = [];
+
+  Object.entries(tables).forEach(([tableName, rows]) => {
+    const byIndex = new Map();
+
+    rows.forEach(row => {
+      const key = `${tableName}:${row.index_name}`;
+      const existing = byIndex.get(key) || {
+        table_name: tableName,
+        index_name: row.index_name,
+        columns: []
+      };
+
+      existing.columns.push(row.column_name);
+      byIndex.set(key, existing);
+    });
+
+    groupedIndexes.push(...byIndex.values());
+  });
+
+  if (!groupedIndexes.length) {
+    table.innerHTML = `<tr><td colspan="3">No B+ tree index metadata available.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = groupedIndexes.slice(0, 12).map(row => `
+    <tr>
+      <td>${row.table_name}</td>
+      <td>${row.index_name}</td>
+      <td>${row.columns.join(", ")}</td>
+    </tr>
+  `).join("");
 }
 
 async function syncRiskAlerts() {

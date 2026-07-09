@@ -116,6 +116,27 @@ MongoDB is used for flexible records that may not follow a strict relational sch
 
 ---
 
+### 6. B+ Tree Indexing and OLAP Warehouse
+
+MedTrack includes an additional database optimisation and analytics layer.
+
+* MySQL/InnoDB B+ tree indexes support faster filtering, joins, sorting, and dashboard lookups.
+* OLTP tables continue to support CRUD operations for devices, failures, and maintenance.
+* OLAP warehouse tables use a star schema with fact and dimension tables for analytical reporting.
+* The dashboard includes an OLAP section showing warehouse KPIs, maintenance cost drilldowns, and index coverage.
+
+Main OLAP tables:
+
+* `dw_dim_date`
+* `dw_dim_device`
+* `dw_dim_technician`
+* `dw_fact_failure`
+* `dw_fact_maintenance`
+
+This allows B+ tree indexing and OLAP analytics to co-exist meaningfully: indexes speed up operational and warehouse queries, while the warehouse supports aggregated reporting.
+
+---
+
 ## Dataset
 
 The project uses the Medical Device Failure Dataset from Kaggle.
@@ -222,6 +243,33 @@ Main MongoDB collections:
 * audit_logs
 
 MongoDB is used for data such as technician observations, event messages, sensor-style snapshots, alert records, and system activity logs.
+
+### B+ Tree Indexes
+
+The SQL script `database/sql/indexes.sql` defines indexes used by the dashboard, CRUD pages, joins, and filters. The warehouse script also defines indexes for OLAP fact and dimension tables. In MySQL/InnoDB, normal primary and secondary indexes are implemented using B+ tree structures.
+
+Examples include:
+
+* `devices(risk_status, age_years)` for high-risk device filtering and ordering
+* `failure_reports(report_status, severity)` for unresolved failure summaries
+* `maintenance_records(repair_status, maintenance_priority, maintenance_cost)` for pending maintenance analytics
+* Warehouse indexes on `dw_fact_failure`, `dw_fact_maintenance`, and dimension tables for OLAP joins and aggregations
+
+The script `database/sql/btree_index_demo.sql` can be used to show index metadata and `EXPLAIN` plans.
+
+### OLAP Warehouse
+
+The script `database/sql/olap_warehouse.sql` builds a star-schema warehouse from the operational MySQL tables. It creates dimension tables for device, technician, and date data, plus fact tables for failures and maintenance. It also creates OLAP cube-style views for maintenance cost and failure analysis.
+
+The backend exposes OLAP endpoints under:
+
+```text
+GET /api/olap/summary
+GET /api/olap/maintenance-cost
+GET /api/olap/failure-cube
+GET /api/olap/risk-matrix
+GET /api/olap/btree-indexes
+```
 
 ---
 
@@ -408,6 +456,24 @@ mysql -u root -p medtrack < database/sql/triggers.sql
 node -r dotenv/config database/loader.js
 ```
 
+After the dataset is loaded, build the OLAP warehouse:
+
+```bash
+mysql -u root medtrack < database/sql/olap_warehouse.sql
+```
+
+If your MySQL uses a password:
+
+```bash
+mysql -u root -p medtrack < database/sql/olap_warehouse.sql
+```
+
+Optional B+ tree index demonstration:
+
+```bash
+mysql -u root medtrack < database/sql/btree_index_demo.sql
+```
+
 After loading, verify the records:
 
 ```bash
@@ -468,6 +534,11 @@ GET /api/devices
 GET /api/failures
 GET /api/maintenance
 GET /api/logs
+GET /api/olap/summary
+GET /api/olap/maintenance-cost
+GET /api/olap/failure-cube
+GET /api/olap/risk-matrix
+GET /api/olap/btree-indexes
 ```
 
 The frontend communicates with these API routes to retrieve and update system data.

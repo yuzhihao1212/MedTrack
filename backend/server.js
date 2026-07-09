@@ -11,6 +11,7 @@ const devicesRouter     = require("./routes/devices");
 const failuresRouter    = require("./routes/failures");
 const maintenanceRouter = require("./routes/maintenance");
 const dashboardRouter   = require("./routes/dashboard");
+const olapRouter        = require("./routes/olap");
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,7 @@ app.use("/api/devices",     devicesRouter);
 app.use("/api/failures",    failuresRouter);
 app.use("/api/maintenance", maintenanceRouter);
 app.use("/api/dashboard",   dashboardRouter);
+app.use("/api/olap",        olapRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {
@@ -40,7 +42,13 @@ app.get("*", (_req, res) => {
 // ─── Startup ─────────────────────────────────────────────────
 async function start() {
   try {
-    await connectMongoDB();
+    try {
+      await connectMongoDB();
+    } catch (mongoError) {
+      console.warn(`[MongoDB] Not connected: ${mongoError.message}`);
+      console.warn("[MongoDB] SQL dashboards and OLAP routes will still be available.");
+    }
+
     app.listen(PORT, () => {
       console.log(`[Server] MedTrack running at http://localhost:${PORT}`);
     });

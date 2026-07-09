@@ -7,6 +7,10 @@ function currentPageName() {
   return page || "index.html";
 }
 
+function isPublicPage(page) {
+  return page === "index.html" || page === "login.html";
+}
+
 function getAuth() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -44,7 +48,7 @@ function requireLogin() {
   const page = currentPageName();
   const isLoginPage = page === "login.html";
 
-  if (!auth && !isLoginPage) {
+  if (!auth && !isPublicPage(page)) {
     window.location.replace("login.html");
     return false;
   }
@@ -63,9 +67,14 @@ function renderAuthBar() {
 
   const auth = getAuth();
   const nav = topbar.querySelector(".nav-links");
+  const page = currentPageName();
 
-  if (!auth && nav) {
+  if (!auth && nav && page !== "index.html") {
     nav.hidden = true;
+  }
+
+  if (!auth && (page === "login.html" || page === "index.html")) {
+    return;
   }
 
   const bar = document.createElement("div");

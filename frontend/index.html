@@ -3,214 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MedTrack | Home</title>
+  <title>MedTrack | Secure Biomedical Intelligence</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 
-<body>
+<body class="landing-page-body">
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="MedTrack Home">
       <img src="assets/medtrack.png" alt="MedTrack Logo" class="brand-logo" />
     </a>
 
-    <nav class="nav-links">
-      <a class="active" href="index.html">Home</a>
-      <a href="dashboard.html">Dashboard</a>
-      <a href="devices.html">Devices</a>
-      <a href="failures.html">Failures</a>
-      <a href="maintenance.html">Maintenance</a>
-      <a href="logs.html">Logs</a>
+    <nav class="nav-links landing-nav">
+      <a class="active" href="index.html">Welcome</a>
     </nav>
   </header>
 
-  <main>
-    <section class="landing-hero">
-      <div class="hero-overlay">
-        <p class="eyebrow">MedTrack Database Intelligence Platform</p>
+  <main class="minimal-landing">
+    <section class="minimal-hero">
+      <img class="hero-image-layer" src="assets/hero-landing.png" alt="" aria-hidden="true" />
 
-        <h1>Smarter medical device monitoring, built for reliable care</h1>
-
-        <p class="hero-text">
-          MedTrack brings device records, failure reports, maintenance activity,
-          and operational logs into one connected platform, helping healthcare
-          teams identify high-risk equipment and plan maintenance with greater confidence.
+      <div class="minimal-copy">
+        <p class="eyebrow">MedTrack</p>
+        <h1>Secure intelligence for biomedical operations.</h1>
+        <p>
+          A protected workspace for device reliability, maintenance work,
+          operational logs, and analytics.
         </p>
 
         <div class="hero-actions">
-          <a class="btn primary" href="dashboard.html">Open Dashboard</a>
-          <a class="btn secondary" href="logs.html">View NoSQL Logs</a>
+          <a class="btn primary" href="login.html">Sign in</a>
         </div>
       </div>
     </section>
 
-    <section class="page stats-section">
-      <div class="stats-heading">
-        <p class="eyebrow">Anonymised Medical Device Data Loaded</p>
-        <h2>Turning medical device records into maintenance insight.</h2>
-      </div>
-
-      <div class="stats-layout">
-        <div class="stats-cards two-card-layout">
-          <article class="stat-card">
-            <span>Medical Devices</span>
-            <strong class="count-up" data-target="4149">0</strong>
-            <p>Device records loaded from the cleaned Kaggle dataset.</p>
-          </article>
-
-          <article class="stat-card">
-            <span>Device Categories</span>
-            <strong class="count-up" data-target="6">0</strong>
-            <p>Includes scanners, pumps, defibrillators and imaging equipment.</p>
-          </article>
-        </div>
-
-        <div class="stats-diagram">
-          <div class="insight-diagram">
-            <span class="pulse-ring ring-1"></span>
-            <span class="pulse-ring ring-2"></span>
-
-            <div class="connector connector-1"></div>
-            <div class="connector connector-2"></div>
-            <div class="connector connector-3"></div>
-            <div class="connector connector-4"></div>
-
-            <div class="diagram-node node-top-left">
-              <small>Structured Layer</small>
-              <strong>MySQL</strong>
-              <p>Devices, failures and maintenance records.</p>
-            </div>
-
-            <div class="diagram-node node-bottom-left">
-              <small>Document Layer</small>
-              <strong>MongoDB</strong>
-              <p>Logs, technician notes and alert history.</p>
-            </div>
-
-            <div class="diagram-node node-top-right">
-              <small>Device Fleet</small>
-              <strong>4,149</strong>
-              <p>Anonymised medical device records loaded.</p>
-            </div>
-
-            <div class="diagram-node node-bottom-right">
-              <small>Categories</small>
-              <strong>6</strong>
-              <p>Medical device types represented in the dataset.</p>
-            </div>
-
-            <div class="diagram-core">
-              <span class="core-label">MedTrack Insight Engine</span>
-              <h3>Maintenance Intelligence</h3>
-              <p>
-                Combining structured records and operational logs to support
-                monitoring, analysis and maintenance decision-making.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="page corporate-section">
-      <h2>One platform for medical device reliability</h2>
-
-      <div class="feature-showcase">
-        <a class="feature-tile tile-navy" href="dashboard.html">
-          <div class="feature-visual">
-            <img src="assets/performance.png" alt="Dashboard analytics" class="feature-image" />
-          </div>
-
-          <div class="feature-content">
-            <div>
-              <h3>Dashboard Intelligence</h3>
-              <p>View high-risk equipment, unresolved failures, maintenance cost and device reliability trends.</p>
-            </div>
-            <span>View Dashboard</span>
-          </div>
-        </a>
-
-        <a class="feature-tile tile-teal" href="devices.html">
-          <div class="feature-visual">
-            <img src="assets/storage.png" alt="Medical device management" class="feature-image" />
-          </div>
-
-          <div class="feature-content">
-            <div>
-              <h3>Medical Device Registry</h3>
-              <p>Manage structured device, manufacturer, failure and maintenance records through MySQL.</p>
-            </div>
-            <span>Manage Devices</span>
-          </div>
-        </a>
-
-        <a class="feature-tile tile-blue" href="logs.html">
-          <div class="feature-visual">
-            <img src="assets/logs.png" alt="NoSQL logs and technician notes" class="feature-image" />
-          </div>
-
-          <div class="feature-content">
-            <div>
-              <h3>Operational Logs</h3>
-              <p>Capture technician notes, event logs, alert history, sensor snapshots and audit records in MongoDB.</p>
-            </div>
-            <span>View NoSQL Logs</span>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="page workflow-section">
-      <div class="section-heading">
-        <p class="eyebrow">How MedTrack works</p>
-        <h2>From raw device data to maintenance decisions.</h2>
-      </div>
-
-      <div class="workflow-grid">
-        <article class="workflow-step">
-          <span>01</span>
-          <h3>Prepare Dataset</h3>
-          <p>Clean and transform Kaggle medical device records for database use.</p>
-        </article>
-
-        <article class="workflow-step">
-          <span>02</span>
-          <h3>Store Structured Data</h3>
-          <p>Use MySQL for devices, failures, maintenance records, technicians and parts.</p>
-        </article>
-
-        <article class="workflow-step">
-          <span>03</span>
-          <h3>Capture Flexible Logs</h3>
-          <p>Use MongoDB for technician notes, event logs, alerts and audit history.</p>
-        </article>
-
-        <article class="workflow-step">
-          <span>04</span>
-          <h3>Analyse Reliability</h3>
-          <p>Use dashboard summaries, views, indexes and triggers to identify risk.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="page advanced-section">
-      <div class="advanced-card">
-        <div>
-          <p class="eyebrow">Additional Feature</p>
-          <h2>Predictive maintenance risk scoring</h2>
-          <p>
-            MedTrack can be extended to calculate risk scores based on failure count,
-            downtime, maintenance frequency, cost and device age. This helps healthcare
-            teams prioritise high-risk equipment before failures become operational problems.
-          </p>
-        </div>
-
-        <div class="advanced-points">
-          <span>MySQL risk scoring view</span>
-          <span>MongoDB alert history</span>
-          <span>Top high-risk device ranking</span>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer">

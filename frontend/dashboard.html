@@ -138,6 +138,92 @@
         </table>
       </div>
     </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">OLAP + B+ Tree Indexing</p>
+          <h2>Warehouse Analytics Layer</h2>
+          <p class="panel-description">
+            The warehouse uses star-schema fact and dimension tables for analytics.
+            MySQL B+ tree indexes support both OLTP lookups and OLAP aggregations.
+          </p>
+        </div>
+      </div>
+
+      <section class="status-banner compact-status" id="olapDashboardStatus">
+        Loading OLAP warehouse data...
+      </section>
+
+      <section class="kpi-grid compact-kpi-grid">
+        <article class="kpi-card">
+          <span>Warehouse Devices</span>
+          <strong id="warehouseDevices">-</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Failure Fact Rows</span>
+          <strong id="failureFactRows">-</strong>
+        </article>
+
+        <article class="kpi-card">
+          <span>Maintenance Fact Rows</span>
+          <strong id="maintenanceFactRows">-</strong>
+        </article>
+
+        <article class="kpi-card success">
+          <span>Total Warehouse Cost</span>
+          <strong id="warehouseMaintenanceCost">-</strong>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article>
+          <div class="panel-header table-section-header">
+            <div>
+              <h3>Maintenance Cost Drilldown</h3>
+              <p class="panel-description">Top manufacturer and device type combinations from the OLAP cube.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap small-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Manufacturer</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Total Cost</th>
+                </tr>
+              </thead>
+              <tbody id="olapCostTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article>
+          <div class="panel-header table-section-header">
+            <div>
+              <h3>B+ Tree Index Coverage</h3>
+              <p class="panel-description">Index metadata from OLTP and warehouse tables.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap small-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>Index</th>
+                  <th>Columns</th>
+                </tr>
+              </thead>
+              <tbody id="btreeIndexTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </section>
   </main>
 
   <script src="js/api.js"></script>

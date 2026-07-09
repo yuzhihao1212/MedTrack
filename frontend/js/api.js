@@ -40,15 +40,18 @@ function clearStoredAuth() {
 }
 
 async function apiRequest(path, options = {}) {
-  const token = getAuthToken();
-  const authHeader = token && !options.skipAuth
-    ? { Authorization: `Bearer ${token}` }
-    : {};
+  let token = null;
+  try {
+    const stored = localStorage.getItem("medtrack_auth");
+    token = stored ? JSON.parse(stored).token : null;
+  } catch (error) {
+    localStorage.removeItem("medtrack_auth");
+  }
 
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       "Content-Type": "application/json",
-      ...authHeader,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {})
     },
     ...options

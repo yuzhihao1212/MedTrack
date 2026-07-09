@@ -2533,3 +2533,25 @@ th {
   color: #b42318;
   font-size: 0.78rem;
 }
+
+/* Login page */
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 8vh;
+}
+
+.login-page .form-layout {
+  grid-template-columns: minmax(0, 420px);
+  justify-content: center;
+}
+
+.login-panel h1 {
+  font-size: 1.9rem;
+  letter-spacing: -0.03em;
+}
+
+.login-panel .muted {
+  margin-bottom: 20px;
+}

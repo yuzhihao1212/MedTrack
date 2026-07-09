@@ -8,6 +8,7 @@ const {
   isNonNegativeNumber,
   isDateString
 } = require("../utils/validation");
+const { authenticate, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 //must match values defined in sql script
@@ -150,7 +151,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/devices
 // create device
-router.post("/", async (req, res) => {
+router.post("/", authenticate, authorize("admin", "technician"), async (req, res) => {
   const {
     device_code,
     device_type_id,
@@ -217,7 +218,7 @@ router.post("/", async (req, res) => {
 
 // PUT /api/devices/:id
 // update device
-router.put("/:id", async (req, res) => {
+router.put("/:id", authenticate, authorize("admin", "technician"), async (req, res) => {
   // validate before fetch device by id
   try {
     const idError = validatePositiveId(req.params.id, "device_id");
@@ -300,7 +301,7 @@ router.put("/:id", async (req, res) => {
 
 // DELETE /api/devices/:id
 // delete device and dependencies
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   //validate id before get connection
   const idError = validatePositiveId(req.params.id, "device_id");
 

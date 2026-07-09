@@ -1,9 +1,7 @@
 USE medtrack;
 
-INSERT INTO users (username, password_hash, role) VALUES
-('admin01', 'hashed_password_1', 'admin'),
-('tech01', 'hashed_password_2', 'technician'),
-('viewer01', 'hashed_password_3', 'viewer');
+-- Login users are seeded separately in seed_users.sql — it's shared by both the
+-- fictional dataset (this file) and the real dataset (loader.js) setup paths.
 
 INSERT INTO manufacturers (manufacturer_name) VALUES
 ('Medtronic'),

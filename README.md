@@ -137,6 +137,45 @@ This allows B+ tree indexing and OLAP analytics to co-exist meaningfully: indexe
 
 ---
 
+### 7. Authentication and Role-Based Access Control (RBAC)
+
+MedTrack enforces access control at two independent layers:
+
+**Application layer (JWT):** `POST /api/auth/login` verifies credentials against
+the `users` table (bcrypt-hashed passwords) and issues a signed JWT carrying
+the user's role. `backend/middleware/auth.js` provides `authenticate`
+(validates the token) and `authorize(...roles)` (checks the role), applied to
+every mutating route:
+
+| Role | Read (GET) | Create / Update | Delete |
+| --- | --- | --- | --- |
+| *(no login)* | ✅ | ❌ | ❌ |
+| `viewer` | ✅ | ❌ | ❌ |
+| `technician` | ✅ | ✅ | ❌ |
+| `admin` | ✅ | ✅ | ✅ |
+
+Reads stay public (matching the "guest" access level from the course's
+application/security design stage); only writes require a token.
+
+**Database layer (DCL):** `database/sql/roles_grants.sql` creates matching
+MySQL/MariaDB roles (`medtrack_viewer`, `medtrack_technician`,
+`medtrack_admin`) with `GRANT`/`REVOKE` privileges scoped table-by-table —
+e.g. `medtrack_technician` is never granted any privilege on `users`, and
+never granted `DELETE` anywhere. This is a standalone demonstration of DCL
+and is not currently wired into the live connection pool (the app still
+connects with the single `MYSQL_USER` from `.env`); see the comments at the
+bottom of the script for how to point the app at one of these accounts.
+
+Demo accounts (seeded by `database/sql/seed_users.sql`, dev only):
+
+| Username | Password | Role |
+| --- | --- | --- |
+| `admin01` | `Admin@123` | admin |
+| `tech01` | `Tech@123` | technician |
+| `viewer01` | `Viewer@123` | viewer |
+
+---
+
 ## Dataset
 
 The project uses the Medical Device Failure Dataset from Kaggle.
@@ -402,6 +441,15 @@ MYSQL_DATABASE=medtrack
 MONGODB_URI=mongodb://127.0.0.1:27017/medtrack_nosql
 MONGO_URI=mongodb://127.0.0.1:27017
 MONGO_DB=medtrack_nosql
+
+JWT_SECRET=replace_with_a_long_random_string
+JWT_EXPIRES_IN=8h
+```
+
+Generate a random `JWT_SECRET` with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
 If your MySQL has a password, update:
@@ -438,6 +486,7 @@ mysql -u root < database/sql/schema.sql
 mysql -u root medtrack < database/sql/views.sql
 mysql -u root medtrack < database/sql/indexes.sql
 mysql -u root medtrack < database/sql/triggers.sql
+mysql -u root medtrack < database/sql/seed_users.sql
 ```
 
 If your MySQL uses a password, use:
@@ -447,6 +496,17 @@ mysql -u root -p < database/sql/schema.sql
 mysql -u root -p medtrack < database/sql/views.sql
 mysql -u root -p medtrack < database/sql/indexes.sql
 mysql -u root -p medtrack < database/sql/triggers.sql
+mysql -u root -p medtrack < database/sql/seed_users.sql
+```
+
+`seed_users.sql` seeds the login accounts (see section 7 above) and is
+required regardless of whether you load device data via `seed.sql` or the
+real dataset loader below — neither of those touches the `users` table.
+
+Optional: apply the DB-level DCL roles/grants demonstration:
+
+```bash
+mysql -u root medtrack < database/sql/roles_grants.sql
 ```
 
 ---
@@ -543,7 +603,7 @@ GET /api/olap/risk-matrix
 GET /api/olap/btree-indexes
 ```
 
-The frontend communicates with these API routes to retrieve and update system data.
+The frontend communicates with these API routes to retrieve and update system data. All `POST`/`PUT`/`PATCH`/`DELETE` routes on `/api/devices`, `/api/failures`, `/api/maintenance`, and `/api/logs` require an `Authorization: Bearer <token>` header from `/api/auth/login` (technician or admin to write, admin only to delete) — see section 7 above.
 
 ---
 

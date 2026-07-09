@@ -6,6 +6,7 @@ const path    = require("path");
 const { connectMongoDB } = require("./config/mongodb");
 
 // Route imports
+const authRouter        = require("./routes/auth");
 const logsRouter        = require("./routes/logs");
 const devicesRouter     = require("./routes/devices");
 const failuresRouter    = require("./routes/failures");
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // ─── Routes ─────────────────────────────────────────────────
+app.use("/api/auth",        authRouter);
 app.use("/api/logs",        logsRouter);
 app.use("/api/devices",     devicesRouter);
 app.use("/api/failures",    failuresRouter);
@@ -41,21 +43,20 @@ app.get("*", (_req, res) => {
 
 // ─── Startup ─────────────────────────────────────────────────
 async function start() {
-  try {
-    try {
-      await connectMongoDB();
-    } catch (mongoError) {
-      console.warn(`[MongoDB] Not connected: ${mongoError.message}`);
-      console.warn("[MongoDB] SQL dashboards and OLAP routes will still be available.");
-    }
-
-    app.listen(PORT, () => {
-      console.log(`[Server] MedTrack running at http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error("[Server] Failed to start:", err.message);
-    process.exit(1);
+  if (!process.env.JWT_SECRET) {
+    console.warn("[Server] JWT_SECRET is not set — auth routes will fail. Add it to backend/.env");
   }
+
+  try {
+    await connectMongoDB();
+  } catch (mongoError) {
+    console.warn(`[MongoDB] Not connected: ${mongoError.message}`);
+    console.warn("[MongoDB] SQL dashboards and OLAP routes will still be available.");
+  }
+
+  app.listen(PORT, () => {
+    console.log(`[Server] MedTrack running at http://localhost:${PORT}`);
+  });
 }
 
 start();

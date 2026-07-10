@@ -53,6 +53,17 @@ function roleLabel(role) {
   return labels[role] || role;
 }
 
+function roleDashboardPath(role) {
+  const dashboards = {
+    bme_admin: "dashboard.html",
+    bme_manager: "dashboard.html#risk-ranking",
+    bme_engineer: "dashboard.html#failure-section",
+    bme_analyst: "dashboard.html#olap-analytics"
+  };
+
+  return dashboards[role] || "dashboard.html";
+}
+
 function requireLogin() {
   const auth = getAuth();
   const page = currentPageName();
@@ -64,7 +75,7 @@ function requireLogin() {
   }
 
   if (auth && isLoginPage) {
-    window.location.replace("dashboard.html");
+    window.location.replace(roleDashboardPath(auth.user?.role));
     return false;
   }
 

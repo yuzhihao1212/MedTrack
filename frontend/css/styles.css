@@ -3084,6 +3084,97 @@ th {
   font-weight: 600;
 }
 
+/* Public entry and login polish */
+
+.landing-page-body .topbar,
+.login-page-body .topbar {
+  position: relative;
+  min-height: 92px;
+  padding: 0 5vw;
+  align-items: center;
+}
+
+.landing-page-body .brand,
+.login-page-body .brand {
+  min-height: 92px;
+}
+
+.landing-page-body .brand-logo,
+.login-page-body .brand-logo {
+  height: 48px;
+}
+
+.landing-page-body .landing-nav {
+  align-self: stretch;
+  align-items: center;
+  gap: 0;
+}
+
+.landing-page-body .landing-nav a {
+  display: inline-flex;
+  min-height: 92px;
+  align-items: center;
+  padding: 0 6px;
+}
+
+.landing-page-body .landing-nav a::after {
+  bottom: 0;
+}
+
+.login-page-body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(31, 45, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+}
+
+.login-page-body .login-topbar {
+  justify-content: flex-start;
+}
+
+.login-page {
+  min-height: calc(100vh - 92px);
+  padding: 7vh 5vw 9vh;
+  align-items: center;
+}
+
+.login-page .form-layout {
+  width: 100%;
+}
+
+.login-panel {
+  width: min(100%, 440px);
+  margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .landing-page-body .topbar,
+  .login-page-body .topbar {
+    min-height: 76px;
+    padding: 0 6vw;
+  }
+
+  .landing-page-body .brand,
+  .login-page-body .brand,
+  .landing-page-body .landing-nav a {
+    min-height: 76px;
+  }
+
+  .landing-page-body .brand-logo,
+  .login-page-body .brand-logo {
+    height: 38px;
+  }
+
+  .landing-page-body .landing-nav a {
+    font-size: 0.84rem;
+  }
+
+  .login-page {
+    min-height: calc(100vh - 76px);
+    padding: 36px 6vw 56px;
+  }
+}
+
 .schema-comparison-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

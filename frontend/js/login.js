@@ -14,7 +14,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
     });
 
     setAuth(token, user);
-    window.location.href = "index.html";
+    window.location.href = roleDashboardPath(user.role);
   } catch (error) {
     setStatus("loginStatus", error.message, "error");
   }

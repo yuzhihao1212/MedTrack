@@ -1,9 +1,5 @@
 USE medtrack;
 
--- MySQL/InnoDB stores normal secondary indexes as B+ tree indexes.
--- These indexes support the OLTP screens, dashboard filters, joins, and sorts.
--- The helper keeps this script safe to rerun on an existing database.
-
 DROP PROCEDURE IF EXISTS add_medtrack_index;
 
 DELIMITER //

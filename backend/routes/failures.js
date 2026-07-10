@@ -303,7 +303,7 @@ router.get("/:id", async (req, res) => {
 
 // DELETE /api/failures/:id
 // delete failure record
-router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "failure_id");
 

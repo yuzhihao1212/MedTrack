@@ -555,7 +555,7 @@ router.put("/:maintenanceId/parts/:partId", authenticate, authorize("bme_admin",
 
 // DELETE /api/maintenance/:id
 // delete maintenance record and dependencies
-router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   const idError = validatePositiveId(req.params.id, "maintenance_id");
   if (idError) {
     return badRequest(res, idError);
@@ -585,7 +585,7 @@ router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async
 
 // DELETE /api/maintenance/:maintenanceId/parts/:partId
 // delete maintenance part
-router.delete("/:maintenanceId/parts/:partId", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/:maintenanceId/parts/:partId", authenticate, authorize("bme_admin"), async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const maintenanceIdError = validatePositiveId(maintenanceId, "maintenance_id");
 

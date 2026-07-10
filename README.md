@@ -157,7 +157,7 @@ role privileges:
 | *(no login)* | ❌ | ❌ | ❌ |
 | `bme_analyst` | ✅ | ❌ | ❌ |
 | `bme_engineer` | ✅ | ✅ | ❌ |
-| `bme_manager` | ✅ | ✅ | ✅ |
+| `bme_manager` | ✅ | ✅ | ❌ |
 | `bme_admin` | ✅ | ✅ | ✅ |
 
 Unauthenticated users are redirected to the login page and cannot access
@@ -168,7 +168,8 @@ MySQL/MariaDB roles (`medtrack_bme_analyst`, `medtrack_bme_engineer`,
 `medtrack_bme_manager`, `medtrack_bme_admin`) with `GRANT`/`REVOKE`
 privileges scoped table-by-table — e.g. `medtrack_bme_engineer` is never
 granted any privilege on `users`, and
-never granted `DELETE` anywhere. This is a standalone demonstration of DCL
+never granted `DELETE` anywhere; deletes are reserved for `bme_admin`.
+This is a standalone demonstration of DCL
 and is not currently wired into the live connection pool (the app still
 connects with the single `MYSQL_USER` from `.env`); see the comments at the
 bottom of the script for how to point the app at one of these accounts.

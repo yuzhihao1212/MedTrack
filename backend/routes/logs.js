@@ -151,7 +151,7 @@ router.put("/notes/:id", authenticate, authorize("bme_admin", "bme_manager", "bm
 });
 
 // DELETE /api/logs/notes/:id
-router.delete("/notes/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/notes/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -226,7 +226,7 @@ router.put("/snapshots/:id", authenticate, authorize("bme_admin", "bme_manager",
 });
 
 // DELETE /api/logs/snapshots/:id
-router.delete("/snapshots/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/snapshots/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -298,7 +298,7 @@ router.patch("/alerts/:id/resolve", authenticate, authorize("bme_admin", "bme_ma
 });
 
 // DELETE /api/logs/alerts/:id
-router.delete("/alerts/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/alerts/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -344,7 +344,7 @@ router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engi
 });
 
 // DELETE /api/logs/:id
-router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }

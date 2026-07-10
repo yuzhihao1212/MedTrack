@@ -301,7 +301,7 @@ router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engi
 
 // DELETE /api/devices/:id
 // delete device and dependencies
-router.delete("/:id", authenticate, authorize("bme_admin", "bme_manager"), async (req, res) => {
+router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   //validate id before get connection
   const idError = validatePositiveId(req.params.id, "device_id");
 

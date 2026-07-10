@@ -105,12 +105,14 @@ async function loadOlapDashboard() {
   setStatus("olapDashboardStatus", "Loading OLAP warehouse data...");
 
   try {
-    const [summary, maintenanceCost, failureTrend, riskMatrix, btreeIndexes] = await Promise.all([
+    const [summary, maintenanceCost, failureTrend, riskMatrix, btreeIndexes, rollup, schemaComparison] = await Promise.all([
       apiRequest("/api/olap/summary"),
       apiRequest("/api/olap/maintenance-cost?limit=8"),
       apiRequest("/api/olap/failure-trend"),
       apiRequest("/api/olap/risk-matrix"),
-      apiRequest("/api/olap/btree-indexes")
+      apiRequest("/api/olap/btree-indexes"),
+      apiRequest("/api/olap/maintenance-cost-rollup"),
+      apiRequest("/api/olap/schema-comparison")
     ]);
 
     document.getElementById("warehouseDevices").textContent = summary.warehouse_devices ?? 0;
@@ -123,6 +125,8 @@ async function loadOlapDashboard() {
     renderFailureTrendChart(failureTrend || []);
     renderRiskMatrixChart(riskMatrix || []);
     renderBtreeIndexTable(btreeIndexes?.tables || {});
+    renderRollupTable(rollup || []);
+    renderSchemaComparison(schemaComparison || null);
 
     setStatus(
       "olapDashboardStatus",
@@ -134,6 +138,8 @@ async function loadOlapDashboard() {
     renderFailureTrendChart([]);
     renderRiskMatrixChart([]);
     renderBtreeIndexTable({});
+    renderRollupTable([]);
+    renderSchemaComparison(null);
     setStatus("olapDashboardStatus", error.message, "error");
   }
 }
@@ -340,6 +346,78 @@ function renderBtreeIndexTable(tables) {
       <td>${row.columns.join(", ")}</td>
     </tr>
   `).join("");
+}
+
+function renderRollupTable(rows) {
+  const table = document.getElementById("rollupTable");
+
+  if (!rows.length) {
+    table.innerHTML = `<tr><td colspan="4">No roll-up data available.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = rows.map(row => {
+    const rowClass = row.row_level === "grand_total"
+      ? "rollup-grand-total"
+      : row.row_level === "subtotal"
+        ? "rollup-subtotal"
+        : "";
+
+    return `
+      <tr class="${rowClass}">
+        <td>${row.rollup_label}</td>
+        <td>${row.maintenance_records ?? 0}</td>
+        <td>${formatMoney(row.total_maintenance_cost)}</td>
+        <td>${formatMoney(row.avg_maintenance_cost)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderSchemaComparison(data) {
+  const panel = document.getElementById("schemaComparisonPanel");
+
+  if (!data) {
+    panel.innerHTML = `<p class="muted">No schema comparison available. Run database/sql/snowflake_variant.sql.</p>`;
+    return;
+  }
+
+  const equivalenceNote = data.results_identical
+    ? `<span class="badge Low">Identical</span> both schemas return the same ${data.row_counts.star_device_rows} devices`
+    : `<span class="badge Critical">Mismatch</span> ${data.mismatched_rows} row(s) differ`;
+
+  panel.innerHTML = `
+    <div class="schema-comparison-summary">
+      <p>${equivalenceNote}</p>
+    </div>
+
+    <div class="schema-comparison-grid">
+      <div class="schema-comparison-card">
+        <h4>Star</h4>
+        <p class="muted">${data.star_schema.table_names.join(", ")}</p>
+        <ul class="schema-plan-list">
+          ${data.star_schema.query_plan.map(step => `
+            <li><strong>${step.table}</strong> — type: ${step.type}, rows: ${step.rows}</li>
+          `).join("")}
+        </ul>
+      </div>
+
+      <div class="schema-comparison-card">
+        <h4>Snowflake</h4>
+        <p class="muted">${data.snowflake_schema.table_names.join(", ")}</p>
+        <ul class="schema-plan-list">
+          ${data.snowflake_schema.query_plan.map(step => `
+            <li><strong>${step.table}</strong> — type: ${step.type}, rows: ${step.rows}</li>
+          `).join("")}
+        </ul>
+      </div>
+    </div>
+
+    <p class="muted schema-comparison-footnote">
+      Same "count devices by manufacturer" query: the star schema reads 1 table,
+      the snowflake variant joins ${data.snowflake_schema.tables_involved} tables to reach the same names.
+    </p>
+  `;
 }
 
 async function syncRiskAlerts() {

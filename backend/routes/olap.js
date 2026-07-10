@@ -31,6 +31,17 @@ function normaliseLimit(value, fallback = 20, max = 100) {
   return Math.min(Math.floor(parsed), max);
 }
 
+// Classifies a GROUP BY ... WITH ROLLUP row as grand-total / subtotal / detail
+// by checking the raw grouped columns for NULL. Done here rather than in SQL
+// because a compound `col_a IS NULL AND col_b IS NOT NULL` expression over
+// rolled-up columns does not evaluate correctly on this MariaDB build (and
+// GROUPING() is unavailable) — see database/sql/rollup_analysis.sql.
+function classifyRollupRow(row, outerCol, innerCol) {
+  if (row[outerCol] === null) return "grand_total";
+  if (row[innerCol] === null) return "subtotal";
+  return "detail";
+}
+
 // GET /api/olap/summary
 // Warehouse-level KPI summary built from star-schema fact and dimension tables.
 router.get("/summary", async (_req, res) => {
@@ -186,6 +197,111 @@ router.get("/btree-indexes", async (_req, res) => {
     });
   } catch (error) {
     handleOlapError(res, "Failed to load B+ tree index metadata", error);
+  }
+});
+
+// GET /api/olap/maintenance-cost-rollup
+// Roll-up: manufacturer -> device type -> grand total, in one query
+// (GROUP BY ... WITH ROLLUP), with subtotal/grand-total rows flagged.
+router.get("/maintenance-cost-rollup", async (_req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT manufacturer_name, type_name, rollup_label,
+        maintenance_records, total_maintenance_cost, avg_maintenance_cost
+      FROM dw_maintenance_cost_rollup_view`
+    );
+
+    success(
+      res,
+      rows.map(row => ({
+        ...row,
+        row_level: classifyRollupRow(row, "manufacturer_name", "type_name")
+      }))
+    );
+  } catch (error) {
+    handleOlapError(res, "Failed to load maintenance cost roll-up", error);
+  }
+});
+
+// GET /api/olap/failure-rollup
+// Roll-up: year -> quarter -> grand total, in one query (GROUP BY ... WITH ROLLUP).
+router.get("/failure-rollup", async (_req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT year_number, quarter_number, rollup_label,
+        failure_reports, total_failure_events, total_downtime_hours
+      FROM dw_failure_rollup_view`
+    );
+
+    success(
+      res,
+      rows.map(row => ({
+        ...row,
+        row_level: classifyRollupRow(row, "year_number", "quarter_number")
+      }))
+    );
+  } catch (error) {
+    handleOlapError(res, "Failed to load failure roll-up", error);
+  }
+});
+
+// GET /api/olap/schema-comparison
+// Star vs snowflake device dimension: row-count parity, an equivalence check,
+// and EXPLAIN plans for the same aggregate query against each schema.
+router.get("/schema-comparison", async (_req, res) => {
+  try {
+    const [[counts]] = await pool.query(
+      `SELECT
+        (SELECT COUNT(*) FROM dw_dim_device) AS star_device_rows,
+        (SELECT COUNT(*) FROM dw_dim_device_snowflake_view) AS snowflake_device_rows,
+        (SELECT COUNT(*) FROM dw_dim_manufacturer) AS snowflake_manufacturer_rows,
+        (SELECT COUNT(*) FROM dw_dim_device_type) AS snowflake_device_type_rows`
+    );
+
+    const [[mismatch]] = await pool.query(
+      `SELECT COUNT(*) AS mismatches FROM dw_dim_device d
+       JOIN dw_dim_device_snowflake_view v ON v.device_key = d.device_key
+       WHERE d.manufacturer_name <> v.manufacturer_name
+          OR d.type_name <> v.type_name
+          OR d.device_code <> v.device_code
+          OR d.risk_status <> v.risk_status`
+    );
+
+    const [starPlan] = await pool.query(
+      `EXPLAIN SELECT manufacturer_name, COUNT(*) FROM dw_dim_device GROUP BY manufacturer_name`
+    );
+
+    const [snowflakePlan] = await pool.query(
+      `EXPLAIN SELECT dm.manufacturer_name, COUNT(*) FROM dw_dim_device_snowflake ds
+       JOIN dw_dim_manufacturer dm ON dm.manufacturer_key = ds.manufacturer_key
+       GROUP BY dm.manufacturer_name`
+    );
+
+    success(res, {
+      row_counts: counts,
+      results_identical: mismatch.mismatches === 0,
+      mismatched_rows: mismatch.mismatches,
+      star_schema: {
+        tables_involved: 1,
+        table_names: ["dw_dim_device"],
+        query_plan: starPlan
+      },
+      snowflake_schema: {
+        tables_involved: 3,
+        table_names: ["dw_dim_device_snowflake", "dw_dim_manufacturer", "dw_dim_device_type"],
+        query_plan: snowflakePlan
+      }
+    });
+  } catch (error) {
+    if (error.code === "ER_NO_SUCH_TABLE") {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to load schema comparison. Run database/sql/snowflake_variant.sql after olap_warehouse.sql.",
+        details: error.message
+      });
+    }
+
+    serverError(res, "Failed to load schema comparison", error);
   }
 });
 

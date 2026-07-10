@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedTrack | Dashboard</title>
+  <script src="js/guard.js"></script>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -327,6 +328,50 @@
               </thead>
               <tbody id="btreeIndexTable"></tbody>
             </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article>
+          <div class="panel-header table-section-header">
+            <div>
+              <h3>Maintenance Cost Roll-Up</h3>
+              <p class="panel-description">
+                Manufacturer &rarr; device type &rarr; grand total, computed in a single
+                <code>GROUP BY ... WITH ROLLUP</code> query.
+              </p>
+            </div>
+          </div>
+
+          <div class="table-wrap small-table rollup-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Group</th>
+                  <th>Records</th>
+                  <th>Total Cost</th>
+                  <th>Avg Cost</th>
+                </tr>
+              </thead>
+              <tbody id="rollupTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article>
+          <div class="panel-header table-section-header">
+            <div>
+              <h3>Star vs Snowflake Schema</h3>
+              <p class="panel-description">
+                Same device dimension, two designs — the star schema flattens manufacturer/type
+                into the device row; the snowflake variant normalises them into their own tables.
+              </p>
+            </div>
+          </div>
+
+          <div id="schemaComparisonPanel" class="schema-comparison">
+            <p class="muted">Loading schema comparison...</p>
           </div>
         </article>
       </section>

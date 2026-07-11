@@ -309,7 +309,7 @@ h3 {
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   margin-bottom: 22px;
 }
@@ -1809,8 +1809,8 @@ tbody tr:hover {
 
 .dashboard-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 238px;
+  gap: 28px;
   align-items: start;
 }
 
@@ -1951,18 +1951,24 @@ tbody tr:hover {
   order: 2;
   position: sticky;
   top: 32px;
-  padding: 8px 0 8px 4px;
+  min-width: 0;
+  padding: 22px 18px 24px;
+  border: 1px solid rgba(16, 10, 85, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 38px rgba(16, 10, 85, 0.06);
+  overflow: hidden;
 }
 
 .dashboard-quick-nav .eyebrow {
-  margin: 0 0 20px 30px;
+  margin: 0 0 18px;
 }
 
 .dashboard-quick-nav nav {
   position: relative;
   display: grid;
   gap: 4px;
-  padding-left: 30px;
+  padding-left: 28px;
 }
 
 .dashboard-quick-nav nav::before {
@@ -3190,7 +3196,7 @@ th {
 }
 
 .app-shell .dashboard-page {
-  width: min(1320px, calc(100vw - 248px - 6vw));
+  width: min(1280px, calc(100vw - 248px - 72px));
 }
 
 .intro-page {

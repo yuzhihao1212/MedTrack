@@ -16,12 +16,8 @@
   <main class="page login-page">
     <section class="grid form-layout">
       <article class="panel login-panel">
-        <p class="eyebrow">RBAC Demo</p>
+        <p class="eyebrow">Welcome</p>
         <h1>Log in to MedTrack</h1>
-        <p class="muted">
-          Log in before accessing MedTrack dashboards, device records,
-          maintenance data, logs, and analytics.
-        </p>
 
         <form id="loginForm" class="form-grid">
           <label>Username
@@ -41,6 +37,21 @@
       </article>
     </section>
   </main>
+
+  <div class="login-transition" id="loginTransition" aria-hidden="true">
+    <div class="login-transition-card" role="status" aria-live="polite">
+      <div class="medtrack-assembly" aria-label="MedTrack loading">
+        <span class="logo-module module-one"></span>
+        <span class="logo-module module-two"></span>
+        <span class="logo-module module-three"></span>
+        <span class="logo-module module-four"></span>
+        <span class="logo-module module-five"></span>
+        <span class="logo-module module-six"></span>
+      </div>
+      <div class="login-transition-word">MedTrack</div>
+      <p>Preparing your workspace</p>
+    </div>
+  </div>
 
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>

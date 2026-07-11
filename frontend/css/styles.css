@@ -226,6 +226,16 @@ h3 {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  cursor: progress;
+  opacity: 0.68;
+  transform: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+}
+
 .btn.secondary {
   color: var(--primary);
   background: transparent;
@@ -3588,6 +3598,221 @@ th {
 .login-panel {
   width: min(100%, 440px);
   margin: 0 auto;
+}
+
+.login-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 16% 22%, rgba(31, 45, 255, 0.34), transparent 30%),
+    radial-gradient(circle at 82% 70%, rgba(102, 34, 180, 0.34), transparent 32%),
+    linear-gradient(135deg, #050047 0%, #08004f 56%, #25013d 100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.login-transition::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 68%);
+  opacity: 0.34;
+  transform: rotate(-8deg);
+}
+
+.login-transition.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.login-transition-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  width: min(86vw, 420px);
+  padding: 44px 32px 40px;
+  color: white;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  transform: translateY(18px) scale(0.98);
+}
+
+.login-transition.is-active .login-transition-card {
+  animation: loginCardEnter 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.medtrack-assembly {
+  position: relative;
+  width: 132px;
+  height: 104px;
+}
+
+.logo-module {
+  position: absolute;
+  display: block;
+  border-radius: 5px;
+  background: #ffffff;
+  box-shadow: 0 18px 38px rgba(23, 40, 255, 0.24);
+  opacity: 0;
+  transform: var(--start);
+}
+
+.module-one {
+  left: 8px;
+  top: 8px;
+  width: 18px;
+  height: 88px;
+  --start: translate3d(-210px, -130px, 0) rotate(-22deg) scale(0.78);
+  --delay: 0.1s;
+}
+
+.module-two {
+  left: 36px;
+  top: 10px;
+  width: 18px;
+  height: 44px;
+  --start: translate3d(170px, -150px, 0) rotate(18deg) scale(0.78);
+  --delay: 0.22s;
+}
+
+.module-three {
+  left: 36px;
+  top: 36px;
+  width: 48px;
+  height: 18px;
+  background: #2034ff;
+  --start: translate3d(-190px, 120px, 0) rotate(14deg) scale(0.78);
+  --delay: 0.34s;
+}
+
+.module-four {
+  left: 74px;
+  top: 36px;
+  width: 18px;
+  height: 60px;
+  background: #dfe6ff;
+  --start: translate3d(180px, 130px, 0) rotate(-16deg) scale(0.78);
+  --delay: 0.46s;
+}
+
+.module-five {
+  left: 100px;
+  top: 12px;
+  width: 18px;
+  height: 84px;
+  background: #f6f8ff;
+  --start: translate3d(0, -220px, 0) rotate(20deg) scale(0.78);
+  --delay: 0.58s;
+}
+
+.module-six {
+  left: 84px;
+  top: 12px;
+  width: 48px;
+  height: 18px;
+  background: #2034ff;
+  --start: translate3d(0, 210px, 0) rotate(-18deg) scale(0.78);
+  --delay: 0.7s;
+}
+
+.login-transition.is-active .logo-module {
+  animation: logoAssemble 1s cubic-bezier(0.16, 1, 0.3, 1) var(--delay) forwards;
+}
+
+.login-transition-word {
+  color: white;
+  font-size: clamp(2.25rem, 8vw, 3.65rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.login-transition.is-active .login-transition-word {
+  animation: loginWordReveal 0.72s ease 1.05s forwards;
+}
+
+.login-transition-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.96rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.login-transition.is-active .login-transition-card p {
+  animation: loginWordReveal 0.6s ease 1.24s forwards;
+}
+
+@keyframes loginCardEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logoAssemble {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: var(--start);
+  }
+
+  65% {
+    opacity: 1;
+    filter: blur(1px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes loginWordReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-transition,
+  .login-transition-card,
+  .logo-module,
+  .login-transition-word,
+  .login-transition-card p {
+    transition: none;
+    animation: none !important;
+  }
+
+  .login-transition.is-active .login-transition-card,
+  .login-transition.is-active .logo-module,
+  .login-transition.is-active .login-transition-word,
+  .login-transition.is-active .login-transition-card p {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (max-width: 720px) {

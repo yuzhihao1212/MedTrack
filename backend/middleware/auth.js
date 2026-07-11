@@ -1,6 +1,13 @@
 const { verifyToken } = require("../utils/auth");
 const { error } = require("../utils/apiResponse");
 
+const ROLE_GROUPS = {
+  ALL_AUTHENTICATED: ["bme_admin", "bme_engineer", "bme_analyst"],
+  OPERATIONAL: ["bme_admin", "bme_engineer"],
+  ANALYTICS: ["bme_admin", "bme_analyst"],
+  ADMIN_ONLY: ["bme_admin"]
+};
+
 // Verifies the Bearer token and attaches { user_id, username, role } to req.user.
 // Does not itself restrict by role — combine with authorize() for that.
 function authenticate(req, res, next) {
@@ -34,4 +41,4 @@ function authorize(...allowedRoles) {
   };
 }
 
-module.exports = { authenticate, authorize };
+module.exports = { authenticate, authorize, ROLE_GROUPS };

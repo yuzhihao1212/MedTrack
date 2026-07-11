@@ -7,7 +7,7 @@ const {
   validateField,
   isNonNegativeNumber
 } = require("../utils/validation");
-const { authenticate, authorize } = require("../middleware/auth");
+const { authenticate, authorize, ROLE_GROUPS } = require("../middleware/auth");
 
 const router = express.Router();
 // match values in sql script
@@ -41,7 +41,7 @@ async function fetchMaintenanceById(connection, maintenanceId) {
 
 // GET /api/maintenance
 // maintenance list
-router.get("/", async (req, res) => {
+router.get("/", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -69,7 +69,7 @@ router.get("/", async (req, res) => {
 
 // GET /api/maintenance/dashboard
 // maintenance dashboard view
-router.get("/dashboard", async (req, res) => {
+router.get("/dashboard", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       "SELECT * FROM maintenance_dashboard_view"
@@ -82,7 +82,7 @@ router.get("/dashboard", async (req, res) => {
 
 // GET /api/maintenance/cost-by-manufacturer
 // cost by manufacturer
-router.get("/cost-by-manufacturer", async (req, res) => {
+router.get("/cost-by-manufacturer", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -104,7 +104,7 @@ router.get("/cost-by-manufacturer", async (req, res) => {
 
 // GET /api/maintenance/workload
 // technician workload
-router.get("/workload", async (req, res) => {
+router.get("/workload", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -126,7 +126,7 @@ router.get("/workload", async (req, res) => {
 
 // GET /api/maintenance/technicians
 // technician lookup
-router.get("/technicians", async (req, res) => {
+router.get("/technicians", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT technician_id, full_name, email, specialisation
@@ -142,7 +142,7 @@ router.get("/technicians", async (req, res) => {
 
 // GET /api/maintenance/parts
 // part lookup
-router.get("/parts", async (req, res) => {
+router.get("/parts", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT part_id, part_name, unit_cost, stock_quantity
@@ -158,7 +158,7 @@ router.get("/parts", async (req, res) => {
 
 // GET /api/maintenance/pending
 // pending maintenance
-router.get("/pending", async (req, res) => {
+router.get("/pending", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -183,7 +183,7 @@ router.get("/pending", async (req, res) => {
 
 // GET /api/maintenance/parts-usage
 // parts usage summary
-router.get("/parts-usage", async (req, res) => {
+router.get("/parts-usage", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -205,7 +205,7 @@ router.get("/parts-usage", async (req, res) => {
 
 // GET /api/maintenance/:id/parts
 // maintenance parts by maintenance id
-router.get("/:id/parts", async (req, res) => {
+router.get("/:id/parts", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "maintenance_id");
     if (idError) {
@@ -233,7 +233,7 @@ router.get("/:id/parts", async (req, res) => {
 
 // GET /api/maintenance/:id
 // single maintenance lookup
-router.get("/:id", async (req, res) => {
+router.get("/:id", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "maintenance_id");
 
@@ -252,7 +252,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/maintenance
 // create maintenance record
-router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const {
     device_id,
     technician_id = null,
@@ -320,7 +320,7 @@ router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engine
 
 // PUT /api/maintenance/:id
 // update maintenance record
-router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "maintenance_id");
 
@@ -409,7 +409,7 @@ router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engi
 
 // PATCH /api/maintenance/:id/status
 // update maintenance status
-router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const { repair_status } = req.body;
   const idError = validatePositiveId(req.params.id, "maintenance_id");
   if (idError) {
@@ -446,7 +446,7 @@ router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_manager", 
 
 // POST /api/maintenance/:id/parts
 // add maintenance part
-router.post("/:id/parts", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/:id/parts", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const maintenanceId = req.params.id;
   const { part_id, quantity_used = 1 } = req.body;
 
@@ -505,7 +505,7 @@ router.post("/:id/parts", authenticate, authorize("bme_admin", "bme_manager", "b
 
 // PUT /api/maintenance/:maintenanceId/parts/:partId
 // update maintenance part
-router.put("/:maintenanceId/parts/:partId", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:maintenanceId/parts/:partId", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const { maintenanceId, partId } = req.params;
   const { quantity_used = 1 } = req.body;
 

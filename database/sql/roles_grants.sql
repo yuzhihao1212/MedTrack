@@ -2,8 +2,8 @@ USE medtrack;
 
 -- Database-level access control (DCL: GRANT / REVOKE / CREATE ROLE / CREATE USER).
 -- This is the DB-layer counterpart to the app-level JWT RBAC in
--- backend/middleware/auth.js. The four roles below map to the current
--- `users.role` values: bme_analyst, bme_engineer, bme_manager, bme_admin.
+-- backend/middleware/auth.js. The three roles below map to the current
+-- `users.role` values: bme_analyst, bme_engineer, bme_admin.
 --
 -- Requires MySQL 8.0+ or MariaDB 10.4+ (role support). Written and verified
 -- against MariaDB 12.2 — this project's actual DB engine, despite the
@@ -14,8 +14,10 @@ USE medtrack;
 CREATE ROLE IF NOT EXISTS
   'medtrack_bme_analyst',
   'medtrack_bme_engineer',
-  'medtrack_bme_manager',
   'medtrack_bme_admin';
+
+DROP USER IF EXISTS 'medtrack_db_manager'@'%';
+DROP ROLE IF EXISTS 'medtrack_bme_manager';
 
 -- Analyst: read-only. Intended for dashboard, OLAP, and report review.
 GRANT SELECT ON medtrack.* TO 'medtrack_bme_analyst';
@@ -34,19 +36,8 @@ GRANT SELECT              ON medtrack.device_types           TO 'medtrack_bme_en
 GRANT SELECT              ON medtrack.technicians            TO 'medtrack_bme_engineer';
 GRANT SELECT              ON medtrack.parts                  TO 'medtrack_bme_engineer';
 
--- Manager: can manage operational records, including delete, but cannot
--- change schema or manage login users.
-GRANT SELECT, INSERT, UPDATE, DELETE ON medtrack.devices             TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE, DELETE ON medtrack.failure_reports      TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE, DELETE ON medtrack.maintenance_records  TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE, DELETE ON medtrack.maintenance_parts    TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE        ON medtrack.manufacturers         TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE        ON medtrack.device_types          TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE        ON medtrack.technicians           TO 'medtrack_bme_manager';
-GRANT SELECT, INSERT, UPDATE        ON medtrack.parts                 TO 'medtrack_bme_manager';
-
--- This mirrors the app-level rule that engineers may create/update but not
--- delete records, while managers and admins may delete.
+-- This mirrors the app-level rule that engineers may create/update operational
+-- records but not delete records. Deletes are reserved for admins.
 -- REVOKE is still demonstrated below where it *does* apply cleanly — undoing
 -- part of a database-wide grant at the same (database-wide) scope it was
 -- granted at.
@@ -64,18 +55,15 @@ REVOKE DROP ON medtrack.* FROM 'medtrack_bme_admin';
 
 CREATE USER IF NOT EXISTS 'medtrack_db_analyst'@'%'  IDENTIFIED BY 'ChangeMe_Analyst1!';
 CREATE USER IF NOT EXISTS 'medtrack_db_engineer'@'%' IDENTIFIED BY 'ChangeMe_Engineer1!';
-CREATE USER IF NOT EXISTS 'medtrack_db_manager'@'%'  IDENTIFIED BY 'ChangeMe_Manager1!';
 CREATE USER IF NOT EXISTS 'medtrack_db_admin'@'%'    IDENTIFIED BY 'ChangeMe_Admin1!';
 
 GRANT 'medtrack_bme_analyst'  TO 'medtrack_db_analyst'@'%';
 GRANT 'medtrack_bme_engineer' TO 'medtrack_db_engineer'@'%';
-GRANT 'medtrack_bme_manager'  TO 'medtrack_db_manager'@'%';
 GRANT 'medtrack_bme_admin'    TO 'medtrack_db_admin'@'%';
 
 -- MariaDB syntax: SET DEFAULT ROLE role FOR user (MySQL uses "TO" instead of "FOR").
 SET DEFAULT ROLE 'medtrack_bme_analyst'  FOR 'medtrack_db_analyst'@'%';
 SET DEFAULT ROLE 'medtrack_bme_engineer' FOR 'medtrack_db_engineer'@'%';
-SET DEFAULT ROLE 'medtrack_bme_manager'  FOR 'medtrack_db_manager'@'%';
 SET DEFAULT ROLE 'medtrack_bme_admin'    FOR 'medtrack_db_admin'@'%';
 
 FLUSH PRIVILEGES;

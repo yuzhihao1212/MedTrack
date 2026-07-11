@@ -41,7 +41,7 @@ const Snapshot = require("../models/SensorSnapshot");
 const Alert = require("../models/Alert");
 const AuditLog = require("../models/AuditLog");
 const { getDB } = require("../config/mongodb");
-const { authenticate, authorize } = require("../middleware/auth");
+const { authenticate, authorize, ROLE_GROUPS } = require("../middleware/auth");
 
 //match project risk/severity categories
 const SEVERITIES = ["Low", "Medium", "High", "Critical"];
@@ -59,7 +59,7 @@ const AGGREGATION_TYPES = [
 // ─── EVENT LOGS ─────────────────────────────────────────────
 
 // GET /api/logs
-router.get("/", async (req, res) => {
+router.get("/", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const filter = {};
     if (req.query.device_code) filter.device_code = req.query.device_code;
@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/logs
-router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const { device_code, event_type, severity, event_message, metadata } = req.body;
     const missing = requireFields(req.body, [
@@ -101,7 +101,7 @@ router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engine
 // ─── TECHNICIAN NOTES ───────────────────────────────────────
 
 // GET /api/logs/notes
-router.get("/notes", async (req, res) => {
+router.get("/notes", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const filter = {};
     if (req.query.device_code) filter.device_code = req.query.device_code;
@@ -115,7 +115,7 @@ router.get("/notes", async (req, res) => {
 });
 
 // POST /api/logs/notes
-router.post("/notes", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/notes", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const { device_code, technician_name, note } = req.body;
     const missing = requireFields(req.body, [
@@ -136,7 +136,7 @@ router.post("/notes", authenticate, authorize("bme_admin", "bme_manager", "bme_e
 });
 
 // PUT /api/logs/notes/:id
-router.put("/notes/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/notes/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -169,7 +169,7 @@ router.delete("/notes/:id", authenticate, authorize("bme_admin"), async (req, re
 // ─── SENSOR SNAPSHOTS ───────────────────────────────────────
 
 // GET /api/logs/snapshots
-router.get("/snapshots", async (req, res) => {
+router.get("/snapshots", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const filter = {};
     if (req.query.device_code) filter.device_code = req.query.device_code;
@@ -182,7 +182,7 @@ router.get("/snapshots", async (req, res) => {
 });
 
 // POST /api/logs/snapshots
-router.post("/snapshots", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/snapshots", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const { device_code, device_type, readings } = req.body;
     const missing = requireFields(req.body, [
@@ -206,7 +206,7 @@ router.post("/snapshots", authenticate, authorize("bme_admin", "bme_manager", "b
 });
 
 // PUT /api/logs/snapshots/:id
-router.put("/snapshots/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/snapshots/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -243,7 +243,7 @@ router.delete("/snapshots/:id", authenticate, authorize("bme_admin"), async (req
 // ─── ALERT HISTORY ──────────────────────────────────────────
 
 // GET /api/logs/alerts
-router.get("/alerts", async (req, res) => {
+router.get("/alerts", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const filter = {};
     if (req.query.device_code) filter.device_code = req.query.device_code;
@@ -257,7 +257,7 @@ router.get("/alerts", async (req, res) => {
 });
 
 // POST /api/logs/alerts
-router.post("/alerts", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/alerts", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const { device_code, alert_type, risk_status, alert_message } = req.body;
     const missing = requireFields(req.body, [
@@ -282,7 +282,7 @@ router.post("/alerts", authenticate, authorize("bme_admin", "bme_manager", "bme_
 });
 
 // PATCH /api/logs/alerts/:id/resolve
-router.patch("/alerts/:id/resolve", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.patch("/alerts/:id/resolve", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -315,7 +315,7 @@ router.delete("/alerts/:id", authenticate, authorize("bme_admin"), async (req, r
 // ─── AUDIT LOGS ─────────────────────────────────────────────
 
 // GET /api/logs/audit
-router.get("/audit", async (req, res) => {
+router.get("/audit", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const filter = {};
     if (req.query.username) filter.username = req.query.username;
@@ -329,7 +329,7 @@ router.get("/audit", async (req, res) => {
 
 //moved down
 // PUT /api/logs/:id
-router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {
     return badRequest(res, "id must be a valid MongoDB ObjectId");
   }
@@ -373,7 +373,7 @@ router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => 
  *   daily_event_trend       – event count per day (last 7 days)
  *   audit_user_summary      – actions per user
  */
-router.get("/aggregations/:type", async (req, res) => {
+router.get("/aggregations/:type", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     if (!AGGREGATION_TYPES.includes(req.params.type)) {
       return badRequest(

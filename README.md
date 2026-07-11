@@ -157,15 +157,23 @@ role privileges:
 | *(no login)* | ❌ | ❌ | ❌ |
 | `bme_analyst` | ✅ | ❌ | ❌ |
 | `bme_engineer` | ✅ | ✅ | ❌ |
-| `bme_manager` | ✅ | ✅ | ❌ |
 | `bme_admin` | ✅ | ✅ | ✅ |
+
+Frontend page access is also role-filtered so users only see the tabs and
+home-page cards relevant to their role:
+
+| Role | Visible Pages / Tabs | Hidden Pages / Tabs |
+| --- | --- | --- |
+| `bme_admin` | Home, Dashboard, Devices, Failures, Maintenance, Logs, Analytics | None |
+| `bme_engineer` | Home, Dashboard, Failures, Maintenance, Logs | Devices, Analytics |
+| `bme_analyst` | Home, Dashboard, Analytics | Devices, Failures, Maintenance, Logs |
 
 Unauthenticated users are redirected to the login page and cannot access
 dashboard, device, failure, maintenance, log, or OLAP API data.
 
 **Database layer (DCL):** `database/sql/roles_grants.sql` creates matching
 MySQL/MariaDB roles (`medtrack_bme_analyst`, `medtrack_bme_engineer`,
-`medtrack_bme_manager`, `medtrack_bme_admin`) with `GRANT`/`REVOKE`
+`medtrack_bme_admin`) with `GRANT`/`REVOKE`
 privileges scoped table-by-table — e.g. `medtrack_bme_engineer` is never
 granted any privilege on `users`, and
 never granted `DELETE` anywhere; deletes are reserved for `bme_admin`.
@@ -179,7 +187,6 @@ Demo accounts (seeded by `database/sql/seed_users.sql`, dev only):
 | Username | Password | Role |
 | --- | --- | --- |
 | `bme_admin01` | `BmeAdmin@123` | bme_admin |
-| `bme_manager01` | `BmeManager@123` | bme_manager |
 | `bme_engineer01` | `BmeEngineer@123` | bme_engineer |
 | `bme_analyst01` | `BmeAnalyst@123` | bme_analyst |
 
@@ -604,7 +611,7 @@ GET /api/olap/failure-rollup
 GET /api/olap/schema-comparison
 ```
 
-The frontend communicates with these API routes to retrieve and update system data. All data routes require an `Authorization: Bearer <token>` header from `/api/auth/login`. `POST`/`PUT`/`PATCH` routes require `bme_engineer`, `bme_manager`, or `bme_admin`; delete routes require `bme_manager` or `bme_admin` — see section 7 above.
+The frontend communicates with these API routes to retrieve and update system data. All data routes require an `Authorization: Bearer <token>` header from `/api/auth/login`. Operational `POST`/`PUT`/`PATCH` routes require `bme_engineer` or `bme_admin`; device master-data changes and all deletes require `bme_admin` — see section 7 above.
 
 ---
 

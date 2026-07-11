@@ -23,7 +23,8 @@ SET role = CASE role
 END;
 
 DELETE FROM users
-WHERE username IN ('admin01', 'tech01', 'viewer01');
+WHERE username IN ('admin01', 'tech01', 'viewer01', 'bme_manager01')
+   OR role = 'bme_manager';
 
 ALTER TABLE users
-MODIFY role ENUM('bme_admin', 'bme_manager', 'bme_engineer', 'bme_analyst') NOT NULL;
+MODIFY role ENUM('bme_admin', 'bme_engineer', 'bme_analyst') NOT NULL;

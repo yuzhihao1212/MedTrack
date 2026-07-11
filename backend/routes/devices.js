@@ -8,7 +8,7 @@ const {
   isNonNegativeNumber,
   isDateString
 } = require("../utils/validation");
-const { authenticate, authorize } = require("../middleware/auth");
+const { authenticate, authorize, ROLE_GROUPS } = require("../middleware/auth");
 
 const router = express.Router();
 //must match values defined in sql script
@@ -43,7 +43,7 @@ async function fetchDeviceById(connection, deviceId) {
 
 // GET /api/devices
 // device list
-router.get("/", async (req, res) => {
+router.get("/", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -98,7 +98,7 @@ router.get("/high-risk", async (req, res) => {
 
 // GET /api/devices/manufacturers
 // manufacturer lookup
-router.get("/manufacturers", async (req, res) => {
+router.get("/manufacturers", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT manufacturer_id, manufacturer_name
@@ -114,7 +114,7 @@ router.get("/manufacturers", async (req, res) => {
 
 // GET /api/devices/device-types
 // device type lookup
-router.get("/device-types", async (req, res) => {
+router.get("/device-types", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT device_type_id, type_name, risk_category
@@ -130,7 +130,7 @@ router.get("/device-types", async (req, res) => {
 
 // GET /api/devices/:id
 // single device lookup
-router.get("/:id", async (req, res) => {
+router.get("/:id", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "device_id");
     if (idError) {
@@ -151,7 +151,7 @@ router.get("/:id", async (req, res) => {
 
 // POST /api/devices
 // create device
-router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/", authenticate, authorize("bme_admin"), async (req, res) => {
   const {
     device_code,
     device_type_id,
@@ -218,7 +218,7 @@ router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engine
 
 // PUT /api/devices/:id
 // update device
-router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
   // validate before fetch device by id
   try {
     const idError = validatePositiveId(req.params.id, "device_id");

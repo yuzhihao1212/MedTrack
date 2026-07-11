@@ -2,6 +2,16 @@ const AUTH_STORAGE_KEY = "medtrack_auth";
 const AUTH_TOKEN_STORAGE_KEY = "medtrack_auth_token";
 const AUTH_USER_STORAGE_KEY = "medtrack_auth_user";
 
+const PAGE_ACCESS = {
+  "home.html": ["bme_admin", "bme_engineer", "bme_analyst"],
+  "dashboard.html": ["bme_admin", "bme_engineer", "bme_analyst"],
+  "devices.html": ["bme_admin"],
+  "failures.html": ["bme_admin", "bme_engineer"],
+  "maintenance.html": ["bme_admin", "bme_engineer"],
+  "logs.html": ["bme_admin", "bme_engineer"],
+  "analytics.html": ["bme_admin", "bme_analyst"]
+};
+
 function currentPageName() {
   const page = window.location.pathname.split("/").pop();
   return page || "index.html";
@@ -12,8 +22,8 @@ function isPublicPage(page) {
 }
 
 function pageAllowedForRole(page, role) {
-  const analystOnlyPages = ["analytics.html"];
-  return !analystOnlyPages.includes(page) || role === "bme_analyst";
+  const allowedRoles = PAGE_ACCESS[page];
+  return !allowedRoles || allowedRoles.includes(role);
 }
 
 function getAuth() {
@@ -51,7 +61,6 @@ function logout() {
 function roleLabel(role) {
   const labels = {
     bme_admin: "Admin",
-    bme_manager: "Manager",
     bme_engineer: "Engineer",
     bme_analyst: "Analyst"
   };
@@ -61,7 +70,6 @@ function roleLabel(role) {
 function roleDashboardPath(role) {
   const dashboards = {
     bme_admin: "dashboard.html",
-    bme_manager: "dashboard.html#risk-ranking",
     bme_engineer: "dashboard.html#failure-section",
     bme_analyst: "analytics.html"
   };
@@ -93,10 +101,22 @@ function requireLogin() {
 }
 
 function applyRoleNavigation(auth) {
+  const setRoleVisibility = (element, allowed) => {
+    element.hidden = !allowed;
+    element.style.display = allowed ? "" : "none";
+  };
+
+  document.querySelectorAll(".nav-links a[href]").forEach(link => {
+    const targetPage = link.getAttribute("href").split("#")[0];
+    setRoleVisibility(link, Boolean(auth && pageAllowedForRole(targetPage, auth.user?.role)));
+  });
+
   document.querySelectorAll("[data-role-only]").forEach(link => {
     const allowedRoles = link.dataset.roleOnly.split(",").map(role => role.trim());
-    link.hidden = !auth || !allowedRoles.includes(auth.user?.role);
+    setRoleVisibility(link, Boolean(auth && allowedRoles.includes(auth.user?.role)));
   });
+
+  document.body.classList.add("role-ready");
 }
 
 function renderAuthBar() {

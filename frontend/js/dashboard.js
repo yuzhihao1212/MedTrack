@@ -499,6 +499,16 @@ function setupDashboardQuickNav() {
 setupDashboardQuickNav();
 
 document.getElementById("refreshDashboardBtn").addEventListener("click", loadDashboard);
-document.getElementById("syncRiskAlertsBtn").addEventListener("click", syncRiskAlerts);
+
+const auth = getAuth();
+const canSyncRiskAlerts = ["bme_admin", "bme_engineer"].includes(auth?.user?.role);
+const syncRiskAlertsBtn = document.getElementById("syncRiskAlertsBtn");
+
+if (syncRiskAlertsBtn && canSyncRiskAlerts) {
+  syncRiskAlertsBtn.addEventListener("click", syncRiskAlerts);
+} else if (syncRiskAlertsBtn) {
+  syncRiskAlertsBtn.hidden = true;
+  setStatus("alertSyncStatus", "Analytics users can view dashboard results only.");
+}
 
 loadDashboard();

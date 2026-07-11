@@ -1,6 +1,7 @@
 let maintenanceRecords = [];
 let maintenanceDevices = [];
 let technicians = [];
+const canDeleteMaintenance = getAuth()?.user?.role === "bme_admin";
 
 async function initMaintenancePage() {
   document.getElementById("reloadMaintenanceBtn").addEventListener("click", loadMaintenanceRecords);
@@ -53,22 +54,28 @@ function renderMaintenanceRecords() {
     return;
   }
 
-  table.innerHTML = rows.map(row => `
-    <tr>
-      <td><strong>${row.device_code}</strong></td>
-      <td>${row.technician_name || "-"}</td>
-      <td>${row.maintenance_frequency ?? "-"}</td>
-      <td>${badge(row.maintenance_priority)}</td>
-      <td>${formatMoney(row.maintenance_cost)}</td>
-      <td>${badge(row.repair_status)}</td>
-      <td>
-        <div class="action-row">
-          <button class="btn secondary" onclick="editMaintenanceRecord(${row.maintenance_id})">Edit</button>
-          <button class="btn danger" onclick="deleteMaintenanceRecord(${row.maintenance_id})">Delete</button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
+  table.innerHTML = rows.map(row => {
+    const deleteAction = canDeleteMaintenance
+      ? `<button class="btn danger" onclick="deleteMaintenanceRecord(${row.maintenance_id})">Delete</button>`
+      : "";
+
+    return `
+      <tr>
+        <td><strong>${row.device_code}</strong></td>
+        <td>${row.technician_name || "-"}</td>
+        <td>${row.maintenance_frequency ?? "-"}</td>
+        <td>${badge(row.maintenance_priority)}</td>
+        <td>${formatMoney(row.maintenance_cost)}</td>
+        <td>${badge(row.repair_status)}</td>
+        <td>
+          <div class="action-row">
+            <button class="btn secondary" onclick="editMaintenanceRecord(${row.maintenance_id})">Edit</button>
+            ${deleteAction}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function editMaintenanceRecord(id) {

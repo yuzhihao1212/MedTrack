@@ -1,5 +1,6 @@
 let failures = [];
 let devicesLookup = [];
+const canDeleteFailures = getAuth()?.user?.role === "bme_admin";
 
 async function initFailuresPage() {
   document.getElementById("reloadFailuresBtn").addEventListener("click", loadFailures);
@@ -44,21 +45,27 @@ function renderFailures() {
     return;
   }
 
-  table.innerHTML = rows.map(row => `
-    <tr>
-      <td><strong>${row.device_code}</strong></td>
-      <td>${row.failure_event_count}</td>
-      <td>${row.downtime_hours ?? "-"}</td>
-      <td>${badge(row.severity)}</td>
-      <td>${badge(row.report_status)}</td>
-      <td>
-        <div class="action-row">
-          <button class="btn secondary" onclick="editFailure(${row.failure_id})">Edit</button>
-          <button class="btn danger" onclick="deleteFailure(${row.failure_id})">Delete</button>
-        </div>
-      </td>
-    </tr>
-  `).join("");
+  table.innerHTML = rows.map(row => {
+    const deleteAction = canDeleteFailures
+      ? `<button class="btn danger" onclick="deleteFailure(${row.failure_id})">Delete</button>`
+      : "";
+
+    return `
+      <tr>
+        <td><strong>${row.device_code}</strong></td>
+        <td>${row.failure_event_count}</td>
+        <td>${row.downtime_hours ?? "-"}</td>
+        <td>${badge(row.severity)}</td>
+        <td>${badge(row.report_status)}</td>
+        <td>
+          <div class="action-row">
+            <button class="btn secondary" onclick="editFailure(${row.failure_id})">Edit</button>
+            ${deleteAction}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function editFailure(id) {

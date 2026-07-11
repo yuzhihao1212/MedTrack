@@ -7,7 +7,7 @@ const {
   validateField,
   isNonNegativeNumber
 } = require("../utils/validation");
-const { authenticate, authorize } = require("../middleware/auth");
+const { authenticate, authorize, ROLE_GROUPS } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ async function fetchFailureById(connection, failureId) {
 
 // GET /api/failures
 // failure list
-router.get("/", async (req, res) => {
+router.get("/", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -88,7 +88,7 @@ router.get("/summary", async (req, res) => {
 
 // GET /api/failures/above-average-devices
 // above-average failure devices
-router.get("/above-average-devices", async (req, res) => {
+router.get("/above-average-devices", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
@@ -113,7 +113,7 @@ router.get("/above-average-devices", async (req, res) => {
 
 // POST /api/failures
 // create failure record
-router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.post("/", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const {
     device_id,
     failure_event_count = 0,
@@ -167,7 +167,7 @@ router.post("/", authenticate, authorize("bme_admin", "bme_manager", "bme_engine
 
 // PUT /api/failures/:id
 // update failure record
-router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.put("/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "failure_id");
 
@@ -244,7 +244,7 @@ router.put("/:id", authenticate, authorize("bme_admin", "bme_manager", "bme_engi
 
 // PATCH /api/failures/:id/status
 // update failure report status
-router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_manager", "bme_engineer"), async (req, res) => {
+router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   const { report_status } = req.body;
   const idError = validatePositiveId(req.params.id, "failure_id");
 
@@ -283,7 +283,7 @@ router.patch("/:id/status", authenticate, authorize("bme_admin", "bme_manager", 
 
 // GET /api/failures/:id
 // single failure lookup
-router.get("/:id", async (req, res) => {
+router.get("/:id", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => {
   try {
     const idError = validatePositiveId(req.params.id, "failure_id");
     if (idError) {

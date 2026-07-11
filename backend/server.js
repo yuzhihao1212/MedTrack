@@ -4,7 +4,7 @@ const cors    = require("cors");
 const path    = require("path");
 
 const { connectMongoDB } = require("./config/mongodb");
-const { authenticate } = require("./middleware/auth");
+const { authenticate, authorize } = require("./middleware/auth");
 
 // Route imports
 const authRouter        = require("./routes/auth");
@@ -36,7 +36,7 @@ app.use("/api/devices",     devicesRouter);
 app.use("/api/failures",    failuresRouter);
 app.use("/api/maintenance", maintenanceRouter);
 app.use("/api/dashboard",   dashboardRouter);
-app.use("/api/olap",        olapRouter);
+app.use("/api/olap",        authorize("bme_analyst"), olapRouter);
 
 // Catch-all: serve frontend for SPA navigation
 app.get("*", (_req, res) => {

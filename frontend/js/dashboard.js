@@ -18,8 +18,6 @@ async function loadDashboard() {
     renderFailureBars(failureSummary || []);
     renderHighRiskTable((highRiskDevices || []).slice(0, 8));
     renderRiskRankingTable(riskRanking || []);
-    await loadOlapDashboard();
-
     setStatus("dashboardStatus", "Dashboard loaded successfully.");
   } catch (error) {
     setStatus("dashboardStatus", error.message, "error");

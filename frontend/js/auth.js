@@ -11,6 +11,11 @@ function isPublicPage(page) {
   return page === "index.html" || page === "login.html";
 }
 
+function pageAllowedForRole(page, role) {
+  const analystOnlyPages = ["analytics.html"];
+  return !analystOnlyPages.includes(page) || role === "bme_analyst";
+}
+
 function getAuth() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -58,7 +63,7 @@ function roleDashboardPath(role) {
     bme_admin: "dashboard.html",
     bme_manager: "dashboard.html#risk-ranking",
     bme_engineer: "dashboard.html#failure-section",
-    bme_analyst: "dashboard.html#olap-analytics"
+    bme_analyst: "analytics.html"
   };
 
   return dashboards[role] || "dashboard.html";
@@ -79,7 +84,19 @@ function requireLogin() {
     return false;
   }
 
+  if (auth && !pageAllowedForRole(page, auth.user?.role)) {
+    window.location.replace("home.html");
+    return false;
+  }
+
   return true;
+}
+
+function applyRoleNavigation(auth) {
+  document.querySelectorAll("[data-role-only]").forEach(link => {
+    const allowedRoles = link.dataset.roleOnly.split(",").map(role => role.trim());
+    link.hidden = !auth || !allowedRoles.includes(auth.user?.role);
+  });
 }
 
 function renderAuthBar() {
@@ -93,6 +110,8 @@ function renderAuthBar() {
   if (!auth && nav && page !== "index.html") {
     nav.hidden = true;
   }
+
+  applyRoleNavigation(auth);
 
   if (!auth && (page === "login.html" || page === "index.html")) {
     return;

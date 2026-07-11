@@ -121,18 +121,52 @@ function initAppNavigation() {
 
   if (!topbar || !toggle || !nav) return;
 
+  if (!topbar.querySelector(".app-mobile-title")) {
+    const pageTitle = (document.title.split("|").pop() || "Dashboard").trim();
+    const auth = getAuth();
+    const title = document.createElement("div");
+    title.className = "app-mobile-title";
+    title.textContent = pageTitle === "Dashboard" && auth ? `${roleLabel(auth.user.role)} Dashboard` : pageTitle;
+    topbar.appendChild(title);
+  }
+
+  if (!topbar.querySelector(".app-mobile-role")) {
+    const auth = getAuth();
+    if (auth) {
+      const role = document.createElement("span");
+      role.className = "app-mobile-role";
+      role.textContent = roleLabel(auth.user.role).toUpperCase();
+      topbar.appendChild(role);
+    }
+  }
+
+  const closeNavigation = () => {
+    topbar.classList.remove("nav-open");
+    document.body.classList.remove("app-nav-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation menu");
+  };
+
   toggle.addEventListener("click", () => {
     const isOpen = topbar.classList.toggle("nav-open");
+    document.body.classList.toggle("app-nav-open", isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
     toggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
   });
 
   nav.addEventListener("click", (event) => {
     if (!event.target.closest("a")) return;
+    closeNavigation();
+  });
 
-    topbar.classList.remove("nav-open");
-    toggle.setAttribute("aria-expanded", "false");
-    toggle.setAttribute("aria-label", "Open navigation menu");
+  document.addEventListener("click", (event) => {
+    if (!document.body.classList.contains("app-nav-open")) return;
+    if (topbar.contains(event.target)) return;
+    closeNavigation();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeNavigation();
   });
 }
 

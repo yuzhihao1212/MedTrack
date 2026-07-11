@@ -3137,6 +3137,11 @@ th {
   display: none;
 }
 
+.app-mobile-title,
+.app-mobile-role {
+  display: none;
+}
+
 .app-shell .nav-links {
   flex: 1;
   flex-direction: column;
@@ -3276,49 +3281,84 @@ th {
 
 @media (max-width: 1100px) {
   .app-shell {
-    padding: 0 0 0 128px;
+    padding: 92px 0 0;
   }
 
   .app-shell .topbar {
-    inset: 0 auto 0 0;
-    width: 128px;
-    height: 100vh;
-    min-height: 0;
-    flex-direction: column;
+    inset: 0 0 auto 0;
+    width: 100%;
+    height: 92px;
+    min-height: 92px;
+    flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     gap: 18px;
-    padding: 26px 16px;
-    border-right: 1px solid rgba(16, 10, 85, 0.1);
-    border-bottom: 0;
-    box-shadow: 18px 0 48px rgba(16, 10, 85, 0.08);
+    padding: 18px 24px 18px 104px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(16, 10, 85, 0.1);
+    box-shadow: 0 14px 38px rgba(16, 10, 85, 0.08);
+  }
+
+  .app-shell::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(18, 26, 47, 0.46);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+  }
+
+  .app-shell.app-nav-open::after {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .app-shell.app-nav-open {
+    overflow: hidden;
   }
 
   .app-shell .brand {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 42;
+    width: min(420px, 78vw);
+    height: 100vh;
     justify-content: center;
-    padding: 0 0 18px;
-    border-bottom: 1px solid rgba(16, 10, 85, 0.08);
+    align-items: flex-start;
+    padding: 42px 34px 28px;
+    border-bottom: 0;
+    background: #f7fbff;
+    border-right: 1px solid rgba(16, 10, 85, 0.1);
+    box-shadow: 28px 0 70px rgba(16, 10, 85, 0.22);
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
   }
 
   .app-shell .brand-logo {
-    width: min(92px, 100%);
+    width: min(220px, 100%);
     height: auto;
     object-fit: contain;
-    object-position: center;
+    object-position: left center;
   }
 
   .app-nav-toggle {
     display: inline-grid;
     place-items: center;
+    position: fixed;
+    top: 22px;
+    left: 24px;
+    z-index: 55;
     gap: 4px;
-    width: 46px;
-    height: 46px;
+    width: 56px;
+    height: 56px;
     border: 1px solid rgba(16, 10, 85, 0.12);
-    border-radius: 14px;
+    border-radius: 50%;
     background: white;
-    box-shadow: 0 10px 24px rgba(16, 10, 85, 0.08);
+    box-shadow: 0 12px 30px rgba(16, 10, 85, 0.12);
     cursor: pointer;
   }
 
@@ -3329,6 +3369,38 @@ th {
     border-radius: 999px;
     background: var(--navy);
     transition: 0.2s ease;
+  }
+
+  .app-mobile-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 56px;
+    padding: 0 22px;
+    border: 1px solid rgba(16, 10, 85, 0.12);
+    border-radius: 18px;
+    color: var(--slate);
+    background: rgba(255, 255, 255, 0.7);
+    font-weight: 850;
+    letter-spacing: 0;
+    box-shadow: 0 10px 26px rgba(16, 10, 85, 0.05);
+  }
+
+  .app-mobile-role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0 24px;
+    border: 1px solid rgba(16, 10, 85, 0.12);
+    border-radius: 18px;
+    color: #11182d;
+    background: white;
+    font-size: 0.9rem;
+    font-weight: 950;
+    letter-spacing: 0.04em;
+    box-shadow: 0 10px 26px rgba(16, 10, 85, 0.06);
   }
 
   .app-shell .topbar.nav-open .app-nav-toggle span:nth-child(1) {
@@ -3344,79 +3416,92 @@ th {
   }
 
   .app-shell .nav-links {
-    position: absolute;
-    top: 26px;
-    left: calc(100% + 14px);
-    width: min(270px, calc(100vw - 160px));
-    display: none;
+    position: fixed;
+    top: 170px;
+    left: 0;
+    z-index: 43;
+    width: min(420px, 78vw);
+    display: flex;
     flex: initial;
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
-    padding: 14px;
-    border: 1px solid rgba(16, 10, 85, 0.1);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 22px 54px rgba(16, 10, 85, 0.14);
-    backdrop-filter: blur(16px);
+    gap: 18px;
+    padding: 34px 34px 0;
+    border: 0;
+    border-top: 1px solid rgba(16, 10, 85, 0.1);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
   }
 
+  .app-shell .topbar.nav-open .brand,
   .app-shell .topbar.nav-open .nav-links {
-    display: flex;
+    transform: translateX(0);
   }
 
   .app-shell .nav-links a {
     width: auto;
-    min-height: 46px;
+    min-height: 48px;
     justify-content: flex-start;
-    padding: 0 16px;
-    font-size: 0.92rem;
+    padding: 0;
+    color: #121a2f;
+    font-size: 1.22rem;
+    font-weight: 900;
     border-radius: 10px;
+    background: transparent;
+  }
+
+  .app-shell .nav-links a.active {
+    color: var(--primary);
   }
 
   .app-shell .nav-links a::after {
-    top: 10px;
-    right: auto;
-    bottom: 10px;
-    left: 0;
-    width: 4px;
-    height: auto;
-    transform: none;
+    display: none;
   }
 
   .app-shell .auth-bar {
-    position: absolute;
-    top: 370px;
-    left: calc(100% + 14px);
-    width: min(270px, calc(100vw - 160px));
-    display: none;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 43;
+    width: min(420px, 78vw);
+    display: grid;
     grid-template-columns: 1fr;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     margin: 0;
-    padding: 14px;
-    border: 1px solid rgba(16, 10, 85, 0.1);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 22px 54px rgba(16, 10, 85, 0.14);
+    padding: 0 34px 34px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
   }
 
   .app-shell .topbar.nav-open .auth-bar {
-    display: grid;
+    transform: translateX(0);
   }
 
   .app-shell .auth-user {
+    padding: 18px 20px;
+    border: 1px solid rgba(16, 10, 85, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
     font-size: 0.82rem;
   }
 
   .app-shell .auth-bar .btn {
-    width: auto;
-    padding: 10px 16px;
-    font-size: 0.82rem;
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1rem;
   }
 
   .app-shell .page {
-    width: min(100% - 32px, calc(100vw - 128px - 32px));
+    width: min(100% - 32px, 1180px);
     margin: 24px auto 56px;
   }
 

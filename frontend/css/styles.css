@@ -3084,6 +3084,134 @@ th {
   font-weight: 600;
 }
 
+/* Logged-in app shell */
+
+.app-shell {
+  min-height: 100vh;
+  padding-left: 248px;
+}
+
+.app-shell .topbar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: 248px;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 28px;
+  padding: 30px 22px;
+  border-right: 1px solid rgba(16, 10, 85, 0.1);
+  border-bottom: 0;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 18px 0 48px rgba(16, 10, 85, 0.06);
+}
+
+.app-shell .brand {
+  justify-content: flex-start;
+  padding: 0 2px 18px;
+  border-bottom: 1px solid rgba(16, 10, 85, 0.08);
+}
+
+.app-shell .brand-logo {
+  height: 44px;
+}
+
+.app-shell .nav-links {
+  flex: 1;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-self: stretch;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.app-shell .nav-links a {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: var(--slate);
+}
+
+.app-shell .nav-links a::after {
+  left: 0;
+  right: auto;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  height: auto;
+  border-radius: 999px;
+}
+
+.app-shell .nav-links a:hover,
+.app-shell .nav-links a.active {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.app-shell .nav-links a:hover::after,
+.app-shell .nav-links a.active::after {
+  background: var(--primary);
+}
+
+.app-shell .auth-bar {
+  display: grid;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid rgba(16, 10, 85, 0.08);
+}
+
+.app-shell .auth-user {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.app-shell .auth-bar .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.app-shell .page {
+  width: min(1180px, calc(100vw - 248px - 8vw));
+  margin: 34px auto 64px;
+}
+
+.app-shell .dashboard-page {
+  width: min(1320px, calc(100vw - 248px - 6vw));
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding-left: 204px;
+  }
+
+  .app-shell .topbar {
+    width: 204px;
+    padding: 24px 16px;
+  }
+
+  .app-shell .brand-logo {
+    height: 36px;
+  }
+
+  .app-shell .nav-links a {
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 0.86rem;
+  }
+
+  .app-shell .page,
+  .app-shell .dashboard-page {
+    width: min(100% - 32px, calc(100vw - 204px - 32px));
+  }
+}
+
 /* Public entry and login polish */
 
 .landing-page-body .topbar,

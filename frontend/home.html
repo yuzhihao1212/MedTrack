@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTrack | Home</title>
+  <script src="js/guard.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="app-shell">
+<header class="topbar">
+  <a class="brand" href="home.html" aria-label="MedTrack Home">
+    <img src="assets/medtrack.png" alt="MedTrack Logo" class="brand-logo" />
+  </a>
+
+  <nav class="nav-links">
+    <a class="active" href="home.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="devices.html">Devices</a>
+    <a href="failures.html">Failures</a>
+    <a href="maintenance.html">Maintenance</a>
+    <a href="logs.html">Logs</a>
+  </nav>
+</header>
+
+  <main class="page intro-page">
+    <section class="intro-hero panel">
+      <p class="eyebrow">Welcome to MedTrack</p>
+      <h1>Biomedical operations, maintenance records, and analytics in one protected workspace.</h1>
+      <p>
+        MedTrack helps the Biomedical Engineering department monitor medical device reliability,
+        track failures, manage maintenance work, review logs, and analyse operational trends.
+      </p>
+    </section>
+
+    <section class="intro-grid">
+      <article class="panel intro-card">
+        <span>01</span>
+        <h2>Operational Dashboard</h2>
+        <p>Review fleet status, unresolved failures, risk ranking, OLAP analytics, and B+ tree search performance.</p>
+      </article>
+
+      <article class="panel intro-card">
+        <span>02</span>
+        <h2>Device Management</h2>
+        <p>Maintain device records, manufacturer details, risk status, and key biomedical inventory information.</p>
+      </article>
+
+      <article class="panel intro-card">
+        <span>03</span>
+        <h2>Failure and Maintenance</h2>
+        <p>Record device failures, update maintenance progress, and keep work history visible for the department.</p>
+      </article>
+
+      <article class="panel intro-card">
+        <span>04</span>
+        <h2>Logs and Notes</h2>
+        <p>Use event logs, technician notes, sensor snapshots, and alerts to support traceability and decisions.</p>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

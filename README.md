@@ -45,7 +45,6 @@ MYSQL_USER=root
 MYSQL_PASSWORD=your_local_mysql_password
 MYSQL_DATABASE=medtrack
 
-MONGODB_URI=mongodb://127.0.0.1:27017/medtrack_nosql
 MONGO_URI=mongodb://127.0.0.1:27017
 MONGO_DB=medtrack_nosql
 

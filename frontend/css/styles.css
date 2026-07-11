@@ -3287,11 +3287,14 @@ th {
 .home-card-media {
   min-height: clamp(150px, 13vw, 210px);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(5, 0, 71, 0.04)),
-    var(--card-image),
     linear-gradient(135deg, #eef2ff 0%, #f8f9ff 48%, #edf4ff 100%);
-  background-position: center;
-  background-size: cover;
+}
+
+.home-card-media img {
+  display: block;
+  width: 100%;
+  height: clamp(150px, 13vw, 210px);
+  object-fit: cover;
 }
 
 .home-card-content {

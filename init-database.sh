@@ -67,6 +67,8 @@ else
 fi
 
 run_sql_file "OLAP warehouse" "$MYSQL_DATABASE" "$ROOT_DIR/database/sql/olap_warehouse.sql"
+run_sql_file "OLAP roll-up analysis" "$MYSQL_DATABASE" "$ROOT_DIR/database/sql/rollup_analysis.sql"
+run_sql_file "OLAP snowflake schema variant" "$MYSQL_DATABASE" "$ROOT_DIR/database/sql/snowflake_variant.sql"
 
 echo "[init-db] Done."
 echo "[init-db] Default accounts:"

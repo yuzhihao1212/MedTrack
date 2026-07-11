@@ -104,44 +104,59 @@ function renderRiskRankingTable(rows) {
 async function loadOlapDashboard() {
   setStatus("olapDashboardStatus", "Loading OLAP warehouse data...");
 
-  try {
-    const [summary, maintenanceCost, failureTrend, riskMatrix, btreeIndexes, rollup, schemaComparison] = await Promise.all([
-      apiRequest("/api/olap/summary"),
-      apiRequest("/api/olap/maintenance-cost?limit=8"),
-      apiRequest("/api/olap/failure-trend"),
-      apiRequest("/api/olap/risk-matrix"),
-      apiRequest("/api/olap/btree-indexes"),
-      apiRequest("/api/olap/maintenance-cost-rollup"),
-      apiRequest("/api/olap/schema-comparison")
-    ]);
+  const requests = {
+    summary: apiRequest("/api/olap/summary"),
+    maintenanceCost: apiRequest("/api/olap/maintenance-cost?limit=8"),
+    failureTrend: apiRequest("/api/olap/failure-trend"),
+    riskMatrix: apiRequest("/api/olap/risk-matrix"),
+    btreeIndexes: apiRequest("/api/olap/btree-indexes"),
+    rollup: apiRequest("/api/olap/maintenance-cost-rollup"),
+    schemaComparison: apiRequest("/api/olap/schema-comparison")
+  };
 
-    document.getElementById("warehouseDevices").textContent = summary.warehouse_devices ?? 0;
-    document.getElementById("failureFactRows").textContent = summary.failure_fact_rows ?? 0;
-    document.getElementById("maintenanceFactRows").textContent = summary.maintenance_fact_rows ?? 0;
-    document.getElementById("warehouseMaintenanceCost").textContent = formatMoney(summary.total_maintenance_cost);
+  const settledEntries = await Promise.all(
+    Object.entries(requests).map(async ([key, request]) => [key, await Promise.resolve(request).then(
+      data => ({ ok: true, data }),
+      error => ({ ok: false, error })
+    )])
+  );
+  const results = Object.fromEntries(settledEntries);
+  const failedResults = Object.entries(results).filter(([, result]) => !result.ok);
 
-    renderOlapCostTable(maintenanceCost || []);
-    renderOlapCostBars(maintenanceCost || []);
-    renderFailureTrendChart(failureTrend || []);
-    renderRiskMatrixChart(riskMatrix || []);
-    renderBtreeIndexTable(btreeIndexes?.tables || {});
-    renderRollupTable(rollup || []);
-    renderSchemaComparison(schemaComparison || null);
+  const summary = results.summary.ok ? results.summary.data : {};
+  const maintenanceCost = results.maintenanceCost.ok ? results.maintenanceCost.data : [];
+  const failureTrend = results.failureTrend.ok ? results.failureTrend.data : [];
+  const riskMatrix = results.riskMatrix.ok ? results.riskMatrix.data : [];
+  const btreeIndexes = results.btreeIndexes.ok ? results.btreeIndexes.data : {};
+  const rollup = results.rollup.ok ? results.rollup.data : [];
+  const schemaComparison = results.schemaComparison.ok ? results.schemaComparison.data : null;
 
+  document.getElementById("warehouseDevices").textContent = summary.warehouse_devices ?? 0;
+  document.getElementById("failureFactRows").textContent = summary.failure_fact_rows ?? 0;
+  document.getElementById("maintenanceFactRows").textContent = summary.maintenance_fact_rows ?? 0;
+  document.getElementById("warehouseMaintenanceCost").textContent = formatMoney(summary.total_maintenance_cost);
+
+  renderOlapCostTable(maintenanceCost || []);
+  renderOlapCostBars(maintenanceCost || []);
+  renderFailureTrendChart(failureTrend || []);
+  renderRiskMatrixChart(riskMatrix || []);
+  renderBtreeIndexTable(btreeIndexes?.tables || {});
+  renderRollupTable(rollup || []);
+  renderSchemaComparison(schemaComparison || null);
+
+  if (failedResults.length) {
     setStatus(
       "olapDashboardStatus",
-      "OLAP warehouse loaded. B+ tree index metadata is available for OLTP and warehouse tables."
+      `Some OLAP data could not load: ${failedResults.map(([key]) => key).join(", ")}. Run the full database initializer if this persists.`,
+      "error"
     );
-  } catch (error) {
-    renderOlapCostTable([]);
-    renderOlapCostBars([]);
-    renderFailureTrendChart([]);
-    renderRiskMatrixChart([]);
-    renderBtreeIndexTable({});
-    renderRollupTable([]);
-    renderSchemaComparison(null);
-    setStatus("olapDashboardStatus", error.message, "error");
+    return;
   }
+
+  setStatus(
+    "olapDashboardStatus",
+    "OLAP warehouse loaded. B+ tree index metadata is available for OLTP and warehouse tables."
+  );
 }
 
 function formatCompactNumber(value) {

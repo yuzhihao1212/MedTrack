@@ -1809,8 +1809,8 @@ tbody tr:hover {
 
 .dashboard-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 238px;
-  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 16vw, 260px);
+  gap: 32px;
   align-items: start;
 }
 
@@ -1819,6 +1819,7 @@ tbody tr:hover {
   display: grid;
   gap: 28px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .dashboard-section {
@@ -1829,6 +1830,7 @@ tbody tr:hover {
   --section-color: var(--primary);
   --section-soft: #f7fbff;
   position: relative;
+  min-width: 0;
   padding: 24px;
   border: 1px solid var(--line);
   border-left: 4px solid var(--section-color);
@@ -1952,6 +1954,7 @@ tbody tr:hover {
   position: sticky;
   top: 32px;
   min-width: 0;
+  max-width: 100%;
   padding: 22px 18px 24px;
   border: 1px solid rgba(16, 10, 85, 0.1);
   border-radius: 16px;
@@ -3196,7 +3199,9 @@ th {
 }
 
 .app-shell .dashboard-page {
-  width: min(1280px, calc(100vw - 248px - 72px));
+  width: auto;
+  max-width: none;
+  margin: 34px 36px 64px;
 }
 
 .intro-page {
@@ -3289,6 +3294,7 @@ th {
   .app-shell .page,
   .app-shell .dashboard-page {
     width: min(100% - 32px, calc(100vw - 204px - 32px));
+    margin: 24px auto 56px;
   }
 
   .intro-grid {

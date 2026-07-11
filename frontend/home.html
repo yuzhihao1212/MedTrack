@@ -29,40 +29,50 @@
   </nav>
 </header>
 
-  <main class="page intro-page">
-    <section class="intro-hero panel">
-      <p class="eyebrow">Welcome to MedTrack</p>
-      <h1>Biomedical operations, maintenance records, and analytics in one protected workspace.</h1>
-      <p>
-        MedTrack helps the Biomedical Engineering department monitor medical device reliability,
-        track failures, manage maintenance work, review logs, and analyse operational trends.
-      </p>
-    </section>
+  <main class="page intro-page display-home-page">
+    <section class="home-display" aria-labelledby="homeDisplayTitle">
+      <div class="home-display-heading">
+        <p class="eyebrow">MedTrack</p>
+        <h1 id="homeDisplayTitle">Biomedical operations intelligence</h1>
+        <p>
+          A protected overview for medical device reliability, maintenance work,
+          operational logs, and analytics across the BME department.
+        </p>
+      </div>
 
-    <section class="intro-grid">
-      <article class="panel intro-card">
-        <span>01</span>
-        <h2>Operational Dashboard</h2>
-        <p>Review fleet status, unresolved failures, risk ranking, OLAP analytics, and B+ tree search performance.</p>
-      </article>
+      <div class="home-display-grid">
+        <article class="home-display-card" style="--card-image: url('assets/home-card-dashboard.png');">
+          <div class="home-card-media" aria-hidden="true"></div>
+          <div class="home-card-content">
+            <h2>Operational Dashboard</h2>
+            <p>View fleet health, unresolved failures, maintenance progress, and high-risk devices at a glance.</p>
+          </div>
+        </article>
 
-      <article class="panel intro-card">
-        <span>02</span>
-        <h2>Device Management</h2>
-        <p>Maintain device records, manufacturer details, risk status, and key biomedical inventory information.</p>
-      </article>
+        <article class="home-display-card" style="--card-image: url('assets/home-card-devices.png');">
+          <div class="home-card-media" aria-hidden="true"></div>
+          <div class="home-card-content">
+            <h2>Device Management</h2>
+            <p>Track device inventory, manufacturer details, departments, locations, and current risk status.</p>
+          </div>
+        </article>
 
-      <article class="panel intro-card">
-        <span>03</span>
-        <h2>Failure and Maintenance</h2>
-        <p>Record device failures, update maintenance progress, and keep work history visible for the department.</p>
-      </article>
+        <article class="home-display-card" style="--card-image: url('assets/home-card-maintenance.png');">
+          <div class="home-card-media" aria-hidden="true"></div>
+          <div class="home-card-content">
+            <h2>Maintenance Workflow</h2>
+            <p>Monitor failure cases, repair progress, completed work, and technician notes for traceability.</p>
+          </div>
+        </article>
 
-      <article class="panel intro-card">
-        <span>04</span>
-        <h2>Logs and Notes</h2>
-        <p>Use event logs, technician notes, sensor snapshots, and alerts to support traceability and decisions.</p>
-      </article>
+        <article class="home-display-card" style="--card-image: url('assets/home-card-analytics.png');">
+          <div class="home-card-media" aria-hidden="true"></div>
+          <div class="home-card-content">
+            <h2>Analytics Warehouse</h2>
+            <p>Summarise OLAP trends, B+ tree search performance, costs, and reliability patterns for planning.</p>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
 

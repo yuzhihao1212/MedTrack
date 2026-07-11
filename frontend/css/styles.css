@@ -3330,7 +3330,7 @@ th {
     height: 100vh;
     justify-content: center;
     align-items: flex-start;
-    padding: 34px 32px 24px;
+    padding: 30px 32px 24px;
     border-bottom: 0;
     background: #f7fbff;
     border-right: 1px solid rgba(16, 10, 85, 0.1);
@@ -3340,7 +3340,7 @@ th {
   }
 
   .app-shell .brand-logo {
-    width: min(196px, 100%);
+    width: min(178px, 100%);
     height: auto;
     object-fit: contain;
     object-position: left center;
@@ -3420,7 +3420,8 @@ th {
 
   .app-shell .nav-links {
     position: fixed;
-    top: 142px;
+    top: 126px;
+    bottom: auto;
     left: 0;
     z-index: 63;
     width: min(390px, 78vw);
@@ -3428,14 +3429,16 @@ th {
     flex: initial;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 28px 32px 0;
+    gap: 8px;
+    padding: 20px 32px 0;
     border: 0;
     border-top: 1px solid rgba(16, 10, 85, 0.1);
     border-radius: 0;
     background: transparent;
     box-shadow: none;
     backdrop-filter: none;
+    max-height: max(220px, calc(100vh - 252px));
+    overflow-y: auto;
     transform: translateX(-105%);
     transition: transform 0.28s ease;
   }
@@ -3447,11 +3450,11 @@ th {
 
   .app-shell .nav-links a {
     width: auto;
-    min-height: 44px;
+    min-height: 40px;
     justify-content: flex-start;
     padding: 0;
     color: #121a2f;
-    font-size: 1.08rem;
+    font-size: 1rem;
     font-weight: 900;
     border-radius: 10px;
     background: transparent;
@@ -3468,15 +3471,16 @@ th {
   .app-shell .auth-bar {
     position: fixed;
     left: 0;
+    top: auto;
     bottom: 0;
     z-index: 63;
     width: min(390px, 78vw);
     display: grid;
     grid-template-columns: 1fr;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin: 0;
-    padding: 0 32px 30px;
+    padding: 0 32px 26px;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -3490,7 +3494,7 @@ th {
   }
 
   .app-shell .auth-user {
-    padding: 16px 18px;
+    padding: 14px 16px;
     border: 1px solid rgba(16, 10, 85, 0.12);
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.86);
@@ -3499,8 +3503,8 @@ th {
 
   .app-shell .auth-bar .btn {
     width: 100%;
-    padding: 12px 18px;
-    font-size: 0.95rem;
+    padding: 11px 18px;
+    font-size: 0.92rem;
   }
 
   .app-shell .page {

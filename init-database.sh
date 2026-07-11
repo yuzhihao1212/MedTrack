@@ -73,6 +73,5 @@ run_sql_file "OLAP snowflake schema variant" "$MYSQL_DATABASE" "$ROOT_DIR/databa
 echo "[init-db] Done."
 echo "[init-db] Default accounts:"
 echo "  bme_admin01     / BmeAdmin@123"
-echo "  bme_manager01   / BmeManager@123"
 echo "  bme_engineer01  / BmeEngineer@123"
 echo "  bme_analyst01   / BmeAnalyst@123"

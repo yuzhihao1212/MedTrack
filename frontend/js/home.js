@@ -1,59 +1,21 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const counters = document.querySelectorAll(".count-up");
-  const statsSection = document.querySelector(".stats-section");
+const HOME_WELCOME_FLAG = "medtrack_show_welcome";
 
-  let hasCounted = false;
+function showLoginWelcome() {
+  const shouldShowWelcome = sessionStorage.getItem(HOME_WELCOME_FLAG) === "1";
+  if (!shouldShowWelcome) return;
 
-  function animateCounter(counter) {
-    const target = Number(counter.dataset.target);
-    const duration = 2200; // slower count speed, increase if you want even slower
-    const startTime = performance.now();
+  sessionStorage.removeItem(HOME_WELCOME_FLAG);
 
-    function updateCounter(currentTime) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+  const auth = typeof getAuth === "function" ? getAuth() : null;
+  const username = auth?.user?.username || "there";
+  const banner = document.getElementById("loginWelcomeBanner");
+  const name = document.getElementById("loginWelcomeName");
 
-      // Smooth easing effect
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      const currentValue = Math.floor(easedProgress * target);
+  if (!banner || !name) return;
 
-      counter.textContent = currentValue.toLocaleString();
+  name.textContent = username;
+  banner.hidden = false;
+  requestAnimationFrame(() => banner.classList.add("is-visible"));
+}
 
-      if (progress < 1) {
-        requestAnimationFrame(updateCounter);
-      } else {
-        counter.textContent = target.toLocaleString();
-      }
-    }
-
-    requestAnimationFrame(updateCounter);
-  }
-
-  function startCounting() {
-    if (hasCounted) return;
-
-    hasCounted = true;
-
-    counters.forEach((counter) => {
-      animateCounter(counter);
-    });
-  }
-
-  if (statsSection) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-
-        if (entry.isIntersecting) {
-          startCounting();
-          observer.disconnect();
-        }
-      },
-      {
-        threshold: 0.35,
-      }
-    );
-
-    observer.observe(statsSection);
-  }
-});
+document.addEventListener("DOMContentLoaded", showLoginWelcome);

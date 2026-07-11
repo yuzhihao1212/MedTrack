@@ -1,5 +1,150 @@
-async function loadDashboard() {
-  setStatus("dashboardStatus", "Loading dashboard data...");
+const DASHBOARD_COUNTED_KEY = "medtrack_dashboard_kpis_counted";
+const DASHBOARD_COUNT_DURATION = 2100;
+const DASHBOARD_COUNT_STAGGER = 120;
+
+function easeOutCubic(progress) {
+  return 1 - Math.pow(1 - progress, 3);
+}
+
+function animateNumber(element, endValue, options = {}) {
+  const {
+    duration = DASHBOARD_COUNT_DURATION,
+    delay = 0,
+    formatter = value => String(Math.round(value))
+  } = options;
+
+  const target = Number(endValue || 0);
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (element._countFrame) {
+    cancelAnimationFrame(element._countFrame);
+  }
+
+  if (element._countDelay) {
+    window.clearTimeout(element._countDelay);
+  }
+
+  if (prefersReducedMotion || duration <= 0) {
+    element.textContent = formatter(target);
+    element.classList.remove("counting-number");
+    return Promise.resolve();
+  }
+
+  element.textContent = formatter(0);
+  element.classList.add("counting-number");
+
+  return new Promise(resolve => {
+    const startAfterDelay = () => {
+      const startedAt = performance.now();
+
+      const tick = now => {
+        const elapsed = now - startedAt;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeOutCubic(progress);
+        element.textContent = formatter(target * eased);
+
+        if (progress < 1) {
+          element._countFrame = requestAnimationFrame(tick);
+        } else {
+          element.textContent = formatter(target);
+          element.classList.remove("counting-number");
+          element._countFrame = null;
+          resolve();
+        }
+      };
+
+      element._countFrame = requestAnimationFrame(tick);
+    };
+
+    element._countDelay = window.setTimeout(startAfterDelay, delay);
+  });
+}
+
+function renderDashboardKpis(summary, animate = false) {
+  const kpis = [
+    { id: "totalDevices", value: summary.total_devices ?? 0 },
+    { id: "unresolvedFailures", value: summary.unresolved_failures ?? 0 },
+    { id: "highRiskDevices", value: summary.high_risk_devices ?? 0 },
+    { id: "completedMaintenance", value: summary.completed_maintenance ?? 0 },
+    {
+      id: "avgMaintenanceCost",
+      value: summary.avg_maintenance_cost ?? 0,
+      formatter: value => formatMoney(value)
+    }
+  ];
+
+  const animations = kpis.map((kpi, index) => {
+    const element = document.getElementById(kpi.id);
+    if (!element) return Promise.resolve();
+
+    const formatter = kpi.formatter || (value => Math.round(value).toLocaleString("en-SG"));
+
+    if (animate) {
+      return animateNumber(element, kpi.value, {
+        duration: DASHBOARD_COUNT_DURATION,
+        delay: index * DASHBOARD_COUNT_STAGGER,
+        formatter
+      });
+    }
+
+    if (element._countFrame) {
+      cancelAnimationFrame(element._countFrame);
+      element._countFrame = null;
+    }
+
+    if (element._countDelay) {
+      window.clearTimeout(element._countDelay);
+      element._countDelay = null;
+    }
+
+    element.textContent = formatter(Number(kpi.value || 0));
+    element.classList.remove("counting-number");
+    return Promise.resolve();
+  });
+
+  return Promise.all(animations);
+}
+
+function dashboardCountAnimationDuration() {
+  const cardCount = document.querySelectorAll("#kpiGrid .kpi-card").length || 5;
+  return DASHBOARD_COUNT_DURATION + Math.max(cardCount - 1, 0) * DASHBOARD_COUNT_STAGGER;
+}
+
+function showDashboardLoadingBar(duration) {
+  const status = document.getElementById("dashboardStatus");
+  if (!status) return;
+
+  status.className = "status-banner dashboard-loading-bar";
+  status.style.color = "";
+  status.innerHTML = `
+    <span>Loading live dashboard data</span>
+    <span class="dashboard-progress-track" aria-hidden="true">
+      <span class="dashboard-progress-fill" style="animation-duration:${duration}ms"></span>
+    </span>
+  `;
+}
+
+function showDashboardLoaded() {
+  const status = document.getElementById("dashboardStatus");
+  if (!status) return;
+
+  status.className = "status-banner dashboard-loaded-banner";
+  status.style.color = "";
+  status.textContent = "Dashboard loaded successfully.";
+}
+
+async function loadDashboard(options = {}) {
+  const forceAnimate = Boolean(options.forceAnimate);
+  const hasCounted = sessionStorage.getItem(DASHBOARD_COUNTED_KEY) === "1";
+  const shouldAnimateKpis = forceAnimate || !hasCounted;
+
+  if (shouldAnimateKpis) {
+    showDashboardLoadingBar(dashboardCountAnimationDuration());
+  } else {
+    const status = document.getElementById("dashboardStatus");
+    if (status) status.className = "status-banner";
+    setStatus("dashboardStatus", "Loading dashboard data...");
+  }
 
   try {
     const [summary, failureSummary, highRiskDevices, riskRanking] = await Promise.all([
@@ -9,17 +154,15 @@ async function loadDashboard() {
       apiRequest("/api/dashboard/risk-ranking?limit=10")
     ]);
 
-    document.getElementById("totalDevices").textContent = summary.total_devices ?? 0;
-    document.getElementById("unresolvedFailures").textContent = summary.unresolved_failures ?? 0;
-    document.getElementById("highRiskDevices").textContent = summary.high_risk_devices ?? 0;
-    document.getElementById("completedMaintenance").textContent = summary.completed_maintenance ?? 0;
-    document.getElementById("avgMaintenanceCost").textContent = formatMoney(summary.avg_maintenance_cost);
-
     renderFailureBars(failureSummary || []);
     renderHighRiskTable((highRiskDevices || []).slice(0, 8));
     renderRiskRankingTable(riskRanking || []);
-    setStatus("dashboardStatus", "Dashboard loaded successfully.");
+    await renderDashboardKpis(summary, shouldAnimateKpis);
+    sessionStorage.setItem(DASHBOARD_COUNTED_KEY, "1");
+    showDashboardLoaded();
   } catch (error) {
+    const status = document.getElementById("dashboardStatus");
+    if (status) status.className = "status-banner";
     setStatus("dashboardStatus", error.message, "error");
   }
 }
@@ -34,12 +177,13 @@ function renderFailureBars(rows) {
 
   const max = Math.max(...rows.map(row => Number(row.total_failure_events || 0)), 1);
 
-  container.innerHTML = rows.map(row => {
+  container.innerHTML = rows.map((row, index) => {
     const total = Number(row.total_failure_events || 0);
     const width = Math.max((total / max) * 100, 4);
+    const highlightClass = index < 3 ? `top-failure-bar top-failure-${index + 1}` : "";
 
     return `
-      <div class="bar-item">
+      <div class="bar-item ${highlightClass}">
         <div class="bar-label">
           <span>${row.type_name}</span>
           <span>${total} events</span>
@@ -77,11 +221,12 @@ function renderRiskRankingTable(rows) {
 
   table.innerHTML = rows.map((row, index) => {
     const rankClass = index < 3 ? "rank-pill top-rank" : "rank-pill";
+    const rowClass = index < 3 ? `priority-glow-row priority-glow-${index + 1}` : "";
     const downtime = Number(row.downtime_hours || 0).toFixed(2);
     const riskScore = Number(row.risk_score || 0).toFixed(2);
 
     return `
-      <tr>
+      <tr class="${rowClass}">
         <td><span class="${rankClass}">#${index + 1}</span></td>
         <td>
           <strong>${row.device_code}</strong>
@@ -498,7 +643,9 @@ function setupDashboardQuickNav() {
 
 setupDashboardQuickNav();
 
-document.getElementById("refreshDashboardBtn").addEventListener("click", loadDashboard);
+document.getElementById("refreshDashboardBtn").addEventListener("click", () => {
+  loadDashboard({ forceAnimate: true });
+});
 
 const auth = getAuth();
 const canSyncRiskAlerts = ["bme_admin", "bme_engineer"].includes(auth?.user?.role);

@@ -1,6 +1,7 @@
 const LOGIN_TRANSITION_MS = 1900;
 const LOGIN_FADE_OUT_MS = 520;
 const LOGIN_HOME_PATH = "home.html";
+const LOGIN_WELCOME_FLAG = "medtrack_show_welcome";
 
 function playLoginTransition(destination) {
   const transition = document.getElementById("loginTransition");
@@ -45,6 +46,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
     });
 
     setAuth(token, user);
+    sessionStorage.setItem(LOGIN_WELCOME_FLAG, "1");
     setStatus("loginStatus", "Login successful. Preparing your workspace...");
     playLoginTransition(LOGIN_HOME_PATH);
   } catch (error) {

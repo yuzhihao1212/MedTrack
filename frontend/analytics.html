@@ -75,6 +75,37 @@
             </div>
           </div>
 
+          <section class="role-demo-banner" data-role-only="bme_analyst">
+            <span>Analyst View</span>
+            <strong>Operational tabs hidden. Analytics enabled.</strong>
+          </section>
+
+          <section class="database-summary-grid" aria-label="Database intelligence summary">
+            <article>
+              <span>OLTP</span>
+              <strong>Daily Operations</strong>
+              <p>Supports device, failure, maintenance, and log workflows.</p>
+            </article>
+
+            <article>
+              <span>OLAP</span>
+              <strong>Decision Support</strong>
+              <p>Aggregates warehouse facts for trends, KPIs, and planning.</p>
+            </article>
+
+            <article>
+              <span>B+ Tree</span>
+              <strong>Faster Access</strong>
+              <p>Improves lookup, filtering, joins, and aggregation paths.</p>
+            </article>
+
+            <article>
+              <span>Star Schema</span>
+              <strong>Dashboard Speed</strong>
+              <p>Uses direct fact-to-dimension joins for simpler analytics.</p>
+            </article>
+          </section>
+
           <section class="status-banner compact-status" id="olapDashboardStatus">
             Loading OLAP warehouse data...
           </section>
@@ -95,7 +126,7 @@
               <strong id="maintenanceFactRows">-</strong>
             </article>
 
-            <article class="kpi-card success">
+            <article class="kpi-card success money-kpi-card">
               <span>Total Warehouse Cost</span>
               <strong id="warehouseMaintenanceCost">-</strong>
             </article>
@@ -111,6 +142,9 @@
               </div>
 
               <div id="olapCostBars" class="horizontal-chart"></div>
+              <p class="query-explainer">
+                Generated from <code>dw_fact_maintenance</code> joined with <code>dw_dim_device</code>.
+              </p>
             </article>
 
             <article class="chart-card">
@@ -177,6 +211,20 @@
               <p class="panel-description">Index metadata from OLTP and warehouse tables.</p>
             </div>
           </div>
+
+          <section class="index-comparison-grid" aria-label="Before and after index comparison">
+            <article>
+              <span>Without Index</span>
+              <strong>Full Table Scan</strong>
+              <p>Database may inspect many rows before filtering or joining.</p>
+            </article>
+
+            <article>
+              <span>With B+ Tree Index</span>
+              <strong>Indexed Lookup</strong>
+              <p>Database can follow ordered access paths to target records faster.</p>
+            </article>
+          </section>
 
           <div class="table-wrap small-table">
             <table>

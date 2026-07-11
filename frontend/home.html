@@ -32,6 +32,11 @@
 
   <main class="page intro-page display-home-page">
     <section class="home-display" aria-labelledby="homeDisplayTitle">
+      <div class="login-welcome-banner" id="loginWelcomeBanner" aria-live="polite" hidden>
+        <span>Welcome,</span>
+        <strong id="loginWelcomeName"></strong>
+      </div>
+
       <div class="home-display-heading">
         <p class="eyebrow">MedTrack</p>
         <h1 id="homeDisplayTitle">Biomedical operations intelligence</h1>
@@ -82,10 +87,26 @@
           </div>
         </article>
       </div>
+
+      <section class="architecture-strip" aria-label="MedTrack database architecture">
+        <div>
+          <p class="eyebrow">System Architecture</p>
+          <h2>From interface to intelligence</h2>
+        </div>
+
+        <div class="architecture-flow">
+          <span>Frontend</span>
+          <span>Express API</span>
+          <span>MySQL OLTP</span>
+          <span>MongoDB Logs</span>
+          <span>OLAP Warehouse</span>
+        </div>
+      </section>
     </section>
   </main>
 
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/home.js"></script>
 </body>
 </html>

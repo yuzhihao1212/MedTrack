@@ -114,5 +114,30 @@ function renderAuthBar() {
   }
 }
 
+function initAppNavigation() {
+  const topbar = document.querySelector(".app-shell .topbar");
+  const toggle = topbar?.querySelector(".app-nav-toggle");
+  const nav = topbar?.querySelector(".nav-links");
+
+  if (!topbar || !toggle || !nav) return;
+
+  toggle.addEventListener("click", () => {
+    const isOpen = topbar.classList.toggle("nav-open");
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+  });
+
+  nav.addEventListener("click", (event) => {
+    if (!event.target.closest("a")) return;
+
+    topbar.classList.remove("nav-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation menu");
+  });
+}
+
 requireLogin();
-document.addEventListener("DOMContentLoaded", renderAuthBar);
+document.addEventListener("DOMContentLoaded", () => {
+  renderAuthBar();
+  initAppNavigation();
+});

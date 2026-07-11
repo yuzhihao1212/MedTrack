@@ -3660,76 +3660,66 @@ th {
 
 .medtrack-assembly {
   position: relative;
-  width: 132px;
-  height: 104px;
+  width: 124px;
+  height: 124px;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);
 }
 
 .logo-module {
   position: absolute;
   display: block;
-  border-radius: 5px;
-  background: #ffffff;
-  box-shadow: 0 18px 38px rgba(23, 40, 255, 0.24);
+  border-radius: 1px;
+  background: #003a91;
   opacity: 0;
   transform: var(--start);
 }
 
 .module-one {
-  left: 8px;
-  top: 8px;
-  width: 18px;
-  height: 88px;
-  --start: translate3d(-210px, -130px, 0) rotate(-22deg) scale(0.78);
+  left: 24px;
+  top: 20px;
+  width: 15px;
+  height: 84px;
+  --start: translate3d(-210px, -128px, 0) rotate(-18deg) scale(0.82);
   --delay: 0.1s;
 }
 
 .module-two {
-  left: 36px;
-  top: 10px;
-  width: 18px;
-  height: 44px;
-  --start: translate3d(170px, -150px, 0) rotate(18deg) scale(0.78);
+  left: 48px;
+  top: 42px;
+  width: 13px;
+  height: 16px;
+  --start: translate3d(-170px, 142px, 0) rotate(14deg) scale(0.82);
   --delay: 0.22s;
 }
 
 .module-three {
-  left: 36px;
-  top: 36px;
-  width: 48px;
-  height: 18px;
-  background: #2034ff;
-  --start: translate3d(-190px, 120px, 0) rotate(14deg) scale(0.78);
+  left: 48px;
+  top: 57px;
+  width: 13px;
+  height: 31px;
+  --start: translate3d(0, -210px, 0) rotate(16deg) scale(0.82);
   --delay: 0.34s;
 }
 
 .module-four {
-  left: 74px;
-  top: 36px;
-  width: 18px;
-  height: 60px;
-  background: #dfe6ff;
-  --start: translate3d(180px, 130px, 0) rotate(-16deg) scale(0.78);
+  left: 63px;
+  top: 42px;
+  width: 34px;
+  height: 16px;
+  --start: translate3d(182px, -118px, 0) rotate(-14deg) scale(0.82);
   --delay: 0.46s;
 }
 
 .module-five {
-  left: 100px;
-  top: 12px;
+  left: 70px;
+  top: 62px;
   width: 18px;
-  height: 84px;
-  background: #f6f8ff;
-  --start: translate3d(0, -220px, 0) rotate(20deg) scale(0.78);
+  height: 42px;
+  background: #26333e;
+  --start: translate3d(172px, 138px, 0) rotate(-12deg) scale(0.82);
   --delay: 0.58s;
-}
-
-.module-six {
-  left: 84px;
-  top: 12px;
-  width: 48px;
-  height: 18px;
-  background: #2034ff;
-  --start: translate3d(0, 210px, 0) rotate(-18deg) scale(0.78);
-  --delay: 0.7s;
 }
 
 .login-transition.is-active .logo-module {

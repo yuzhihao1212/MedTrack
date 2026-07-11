@@ -75,7 +75,7 @@ function requireLogin() {
   }
 
   if (auth && isLoginPage) {
-    window.location.replace(roleDashboardPath(auth.user?.role));
+    window.location.replace("home.html");
     return false;
   }
 

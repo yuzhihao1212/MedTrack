@@ -3636,6 +3636,17 @@ th {
   pointer-events: auto;
 }
 
+.login-transition.is-active.is-leaving {
+  opacity: 0;
+  transition: opacity 0.52s ease;
+}
+
+.login-transition.is-leaving .login-transition-card {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.985);
+  transition: opacity 0.42s ease, transform 0.52s ease;
+}
+
 .login-transition-card {
   position: relative;
   display: grid;

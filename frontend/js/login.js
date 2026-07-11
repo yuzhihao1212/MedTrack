@@ -1,4 +1,6 @@
 const LOGIN_TRANSITION_MS = 1900;
+const LOGIN_FADE_OUT_MS = 520;
+const LOGIN_HOME_PATH = "home.html";
 
 function playLoginTransition(destination) {
   const transition = document.getElementById("loginTransition");
@@ -12,10 +14,16 @@ function playLoginTransition(destination) {
   requestAnimationFrame(() => transition.classList.add("is-active"));
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const displayMs = prefersReducedMotion ? 350 : LOGIN_TRANSITION_MS;
+  const fadeMs = prefersReducedMotion ? 0 : LOGIN_FADE_OUT_MS;
 
   window.setTimeout(() => {
-    window.location.href = destination;
-  }, prefersReducedMotion ? 350 : LOGIN_TRANSITION_MS);
+    transition.classList.add("is-leaving");
+
+    window.setTimeout(() => {
+      window.location.href = destination;
+    }, fadeMs);
+  }, displayMs);
 }
 
 document.getElementById("loginForm").addEventListener("submit", async (event) => {
@@ -38,7 +46,7 @@ document.getElementById("loginForm").addEventListener("submit", async (event) =>
 
     setAuth(token, user);
     setStatus("loginStatus", "Login successful. Preparing your workspace...");
-    playLoginTransition(roleDashboardPath(user.role));
+    playLoginTransition(LOGIN_HOME_PATH);
   } catch (error) {
     if (submitButton) submitButton.disabled = false;
     setStatus("loginStatus", error.message, "error");

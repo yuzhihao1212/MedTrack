@@ -121,14 +121,41 @@ MedTrack uses role-based access control in both the application and database lay
 ## Project Structure
 
 ```text
-project/
-  backend/
-  database/
-    sql/
-  docs/
-  frontend/
-  init-database.sh
-  README.md
+├── backend/
+│   ├── config/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── scripts/
+│   ├── utils/
+│   ├── loader.js
+│   └── server.js
+├── database/
+│   ├── analysis/
+│   ├── cleaned/
+│   ├── nosql/
+│   ├── raw/
+│   ├── sql/
+│   └── loader.js
+├── docs/
+│   ├── dataset_summary.md
+│   ├── dataset_to_database_mapping.md
+│   └── erd.dbml
+├── frontend/
+│   ├── assets/
+│   ├── css/
+│   ├── js/
+│   ├── analytics.html
+│   ├── dashboard.html
+│   ├── devices.html
+│   ├── failures.html
+│   ├── home.html
+│   ├── index.html
+│   ├── login.html
+│   ├── logs.html
+│   └── maintenance.html
+├── init-database.sh
+└── README.md
 ```
 
 ## Notes

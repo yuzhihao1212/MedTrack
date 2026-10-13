@@ -297,7 +297,6 @@ All successful API responses use `{ "success": true, "data": ... }`; errors use 
 ├── frontend/                Plain HTML, CSS, JavaScript and static assets
 ├── .env.example             Placeholder-only configuration template
 ├── init-database.sh         Ordered local database initialisation
-├── LICENSE                  MIT license
 └── README.md                Project overview and runbook
 ```
 
@@ -344,7 +343,3 @@ Contributors:
 - Kareem Mohamed Arif ([@arifkareem](https://github.com/arifkareem))
 - Isaac Lim Yee Shao ([@izaclimys-ux](https://github.com/izaclimys-ux))
 - Darius Kan Teng Onn ([@Dkkan-dev](https://github.com/Dkkan-dev))
-
-## License
-
-Released under the [MIT License](LICENSE).

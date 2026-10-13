@@ -1,10 +1,13 @@
-require("dotenv").config();
 const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
 
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
+require("dotenv").config({ path: path.join(__dirname, ".env"), override: true });
+
 const { connectMongoDB } = require("./config/mongodb");
 const { authenticate, authorize, ROLE_GROUPS } = require("./middleware/auth");
+const { success } = require("./utils/apiResponse");
 
 // Route imports
 const authRouter        = require("./routes/auth");
@@ -26,7 +29,7 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 // ─── Routes ─────────────────────────────────────────────────
 // Health check
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  success(res, { status: "ok", timestamp: new Date().toISOString() });
 });
 
 app.use("/api/auth", authRouter);
@@ -46,7 +49,7 @@ app.get("*", (_req, res) => {
 // ─── Startup ─────────────────────────────────────────────────
 async function start() {
   if (!process.env.JWT_SECRET) {
-    console.warn("[Server] JWT_SECRET is not set; using the local development fallback. Add it to backend/.env before deployment.");
+    throw new Error("JWT_SECRET is required. Copy .env.example to .env and set a local secret.");
   }
 
   try {
@@ -61,4 +64,7 @@ async function start() {
   });
 }
 
-start();
+start().catch((error) => {
+  console.error(`[Server] Failed to start: ${error.message}`);
+  process.exit(1);
+});

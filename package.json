@@ -1,8 +1,16 @@
 {
+  "name": "medtrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hybrid MySQL and MongoDB medical device tracking project",
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend run dev",
+    "init-db": "bash init-database.sh"
+  },
   "dependencies": {
-    "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
-    "mongoose": "^9.7.1",
+    "mongodb": "^6.7.0",
     "mysql2": "^3.22.5"
   }
 }

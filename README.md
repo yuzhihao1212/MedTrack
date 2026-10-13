@@ -324,6 +324,14 @@ The course materials identified the source file as `Medical_Device_Failure_datas
 - Use separate runtime database accounts or pools if database privileges need to mirror application roles end to end.
 - Add a Docker Compose development environment after the initialisation lifecycle and readiness checks are covered by tests.
 
+## My contribution
+
+- I created the initial relational schema and seed data, then added SQL views, indexes, triggers and query examples, along with ERD and dataset-mapping documentation.
+- I added the MongoDB collection design, sample documents, CRUD examples and aggregation queries.
+- I built the first set of plain HTML and JavaScript pages for the dashboard, devices, failures, maintenance and logs, then worked on the public landing and login flow, role-aware home page and responsive navigation.
+- I added predictive risk scoring to the dashboard and built the OLAP warehouse, API routes and dedicated analytics page.
+- I created database initialisation scripts and later added automated unit and database integration tests, CI and the portfolio documentation.
+
 ## Project context and contributors
 
 MedTrack began as a team project for the INF2003 database course (Group 23) and is being prepared here as a portfolio example of relational, document and analytical database design.

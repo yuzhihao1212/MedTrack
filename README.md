@@ -337,7 +337,7 @@ MedTrack began as a team project for the INF2003 database course (Group 23) and 
 
 Contributors:
 
-- [@yuzhihao1212](https://github.com/yuzhihao1212)
+- Yu ZhiHao ([@yuzhihao1212](https://github.com/yuzhihao1212))
 - [@kthgoat](https://github.com/kthgoat)
 - [@mmmmm0e](https://github.com/mmmmm0e)
 - [@arifkareem](https://github.com/arifkareem)

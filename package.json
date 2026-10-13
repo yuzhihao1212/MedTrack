@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm --prefix backend start",
     "dev": "npm --prefix backend run dev",
-    "init-db": "bash init-database.sh"
+    "init-db": "bash init-database.sh",
+    "test": "node --test backend/tests/*.test.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

@@ -1,0 +1,67 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci_mysql_password
+          MYSQL_DATABASE: medtrack
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pci_mysql_password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd="mongosh --quiet --eval 'db.adminCommand({ ping: 1 }).ok'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      NODE_ENV: test
+      PORT: 3000
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ci_mysql_password
+      MYSQL_DATABASE: medtrack
+      MONGO_URI: mongodb://127.0.0.1:27017
+      MONGO_DB: medtrack_nosql
+      JWT_SECRET: medtrack-ci-only-jwt-secret-not-for-deployment
+      JWT_EXPIRES_IN: 8h
+      SKIP_DATA_LOAD: 0
+      INTEGRATION_REQUIRED: 1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            backend/package-lock.json
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix backend
+      - name: Initialize databases
+        run: bash init-database.sh
+      - name: Run unit and integration tests
+        run: npm test

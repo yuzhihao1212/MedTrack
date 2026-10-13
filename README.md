@@ -1,5 +1,7 @@
 # MedTrack
 
+[![Tests](https://github.com/kthgoat/DB_INF2003_GRP23/actions/workflows/test.yml/badge.svg)](https://github.com/kthgoat/DB_INF2003_GRP23/actions/workflows/test.yml)
+
 MedTrack is a university database project for tracking medical devices, failure reports, maintenance work, parts and operational logs. It addresses the split nature of hospital equipment data: structured records that need relational integrity live in MySQL, while variable event, sensor, note, alert and audit documents live in MongoDB. A Node.js/Express API and browser-based frontend bring both stores together for operational dashboards and analytical reporting.
 
 ## Highlights
@@ -143,7 +145,7 @@ npm --prefix backend install
 cp .env.example .env
 ```
 
-Set `MYSQL_PASSWORD` for your local database and replace `JWT_SECRET` with a long random value. The backend loads the root `.env`; an optional `backend/.env` can override it for older local setups. Both files remain ignored by Git.
+Set `MYSQL_PASSWORD` for your local database, change `MYSQL_PORT` if MySQL is not on port 3306, and replace `JWT_SECRET` with a long random value. The backend loads the root `.env`; an optional `backend/.env` can override it for older local setups. Both files remain ignored by Git.
 
 ### 3. Initialise the databases
 
@@ -186,6 +188,16 @@ These development-only accounts come from [database/sql/seed_users.sql](database
 | `bme_analyst01` | `BmeAnalyst@123` | `bme_analyst` |
 
 Do not reuse these credentials outside local demonstration environments.
+
+## Testing
+
+Run the unit and integration tests with `npm test` after installing both sets of dependencies. Unit tests cover validation, response helpers, password hashing, JWTs and role middleware. Integration tests cover the seeded logins, access control, device CRUD and an OLAP summary against real MySQL and MongoDB. They report a skip when either database is unavailable locally.
+
+```bash
+npm test
+```
+
+The [GitHub Actions workflow](.github/workflows/test.yml) starts disposable MySQL and MongoDB services, runs `init-database.sh`, and sets `INTEGRATION_REQUIRED=1` so missing databases fail CI instead of being skipped.
 
 ## API overview
 
@@ -304,7 +316,6 @@ The course materials identified the source file as `Medical_Device_Failure_datas
 
 ## Possible improvements
 
-- Add automated route tests with disposable MySQL and MongoDB instances, plus CI for syntax, tests and dependency audits.
 - Add migration tooling so schema changes do not rely on rebuilding the development database.
 - Validate MongoDB document shapes and add a reconciliation job for soft `device_code` references.
 - Expand audit logging around SQL mutations; the current MongoDB audit model is present but not applied to every operational route.

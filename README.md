@@ -1,6 +1,6 @@
 # MedTrack
 
-[![Tests](https://github.com/kthgoat/DB_INF2003_GRP23/actions/workflows/test.yml/badge.svg)](https://github.com/kthgoat/DB_INF2003_GRP23/actions/workflows/test.yml)
+[![Tests](https://github.com/yuzhihao1212/medtrack/actions/workflows/test.yml/badge.svg)](https://github.com/yuzhihao1212/medtrack/actions/workflows/test.yml)
 
 MedTrack is a university database project for tracking medical devices, failure reports, maintenance work, parts and operational logs. It addresses the split nature of hospital equipment data: structured records that need relational integrity live in MySQL, while variable event, sensor, note, alert and audit documents live in MongoDB. A Node.js/Express API and browser-based frontend bring both stores together for operational dashboards and analytical reporting.
 

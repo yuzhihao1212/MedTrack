@@ -204,7 +204,6 @@ router.post("/", authenticate, authorize("bme_admin"), async (req, res) => {
 
     const device = await fetchDeviceById(pool, result.insertId);
 
-    //success
     created(res, device, "Device created");
 
   } catch (error) {
@@ -219,7 +218,6 @@ router.post("/", authenticate, authorize("bme_admin"), async (req, res) => {
 // PUT /api/devices/:id
 // update device
 router.put("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
-  // validate before fetch device by id
   try {
     const idError = validatePositiveId(req.params.id, "device_id");
 
@@ -302,7 +300,6 @@ router.put("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
 // DELETE /api/devices/:id
 // delete device and dependencies
 router.delete("/:id", authenticate, authorize("bme_admin"), async (req, res) => {
-  //validate id before get connection
   const idError = validatePositiveId(req.params.id, "device_id");
 
   if (idError) {

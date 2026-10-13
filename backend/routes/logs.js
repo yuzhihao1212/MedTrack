@@ -327,7 +327,6 @@ router.get("/audit", authorize(...ROLE_GROUPS.OPERATIONAL), async (req, res) => 
   }
 });
 
-//moved down
 // PUT /api/logs/:id
 router.put("/:id", authenticate, authorize("bme_admin", "bme_engineer"), async (req, res) => {
   if (!validateObjectId(req.params.id)) {

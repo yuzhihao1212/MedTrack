@@ -2,6 +2,7 @@ const express = require("express");
 const pool = require("../config/mysql");
 const Alert = require("../models/Alert");
 const { authenticate, authorize } = require("../middleware/auth");
+const { success, serverError } = require("../utils/apiResponse");
 
 const router = express.Router();
 
@@ -19,9 +20,9 @@ router.get("/", async (req, res) => {
         (SELECT COUNT(*) FROM device_risk_score_view WHERE risk_score >= 80) AS predictive_high_risk_devices`
     );
 
-    res.json({
-      success: true,
-      data: rows[0] || {
+    success(
+      res,
+      rows[0] || {
         total_devices: 0,
         unresolved_failures: 0,
         high_risk_devices: 0,
@@ -29,13 +30,9 @@ router.get("/", async (req, res) => {
         avg_maintenance_cost: 0,
         predictive_high_risk_devices: 0
       }
-    });
+    );
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load dashboard data",
-      error: error.message
-    });
+    serverError(res, "Failed to load dashboard data", error);
   }
 });
 
@@ -68,16 +65,9 @@ router.get("/risk-ranking", async (req, res) => {
       [limit]
     );
 
-    res.json({
-      success: true,
-      data: rows
-    });
+    success(res, rows);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to load risk ranking data",
-      error: error.message
-    });
+    serverError(res, "Failed to load risk ranking data", error);
   }
 });
 
@@ -131,22 +121,18 @@ router.post("/risk-alerts/sync", authenticate, authorize("bme_admin", "bme_engin
       createdAlerts.push(alert);
     }
 
-    res.json({
-      success: true,
-      message: "Risk alerts synced successfully",
-      data: {
+    success(
+      res,
+      {
         scanned_devices: riskRows.length,
         created_alerts: createdCount,
         skipped_existing_alerts: skippedCount,
         alerts: createdAlerts
-      }
-    });
+      },
+      "Risk alerts synced successfully"
+    );
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to sync predictive risk alerts",
-      error: error.message
-    });
+    serverError(res, "Failed to sync predictive risk alerts", error);
   }
 });
 

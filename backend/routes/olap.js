@@ -1,6 +1,6 @@
 const express = require("express");
 const pool = require("../config/mysql");
-const { success, serverError } = require("../utils/apiResponse");
+const { success, error: apiError, serverError } = require("../utils/apiResponse");
 
 const router = express.Router();
 
@@ -15,11 +15,12 @@ const INDEX_TABLES = [
 
 function handleOlapError(res, message, error) {
   if (error.code === "ER_NO_SUCH_TABLE") {
-    return res.status(500).json({
-      success: false,
-      message: `${message}. Run database/sql/olap_warehouse.sql after loading the dataset.`,
-      details: error.message
-    });
+    return apiError(
+      res,
+      500,
+      `${message}. Run database/sql/olap_warehouse.sql after loading the dataset.`,
+      error.message
+    );
   }
 
   return serverError(res, message, error);
@@ -179,7 +180,7 @@ router.get("/btree-indexes", async (_req, res) => {
     const indexResults = {};
 
     for (const tableName of INDEX_TABLES) {
-      const [rows] = await pool.query(`SHOW INDEX FROM ${tableName}`);
+      const [rows] = await pool.query("SHOW INDEX FROM ??", [tableName]);
       indexResults[tableName] = rows.map(row => ({
         table_name: row.Table,
         index_name: row.Key_name,
@@ -294,11 +295,12 @@ router.get("/schema-comparison", async (_req, res) => {
     });
   } catch (error) {
     if (error.code === "ER_NO_SUCH_TABLE") {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to load schema comparison. Run database/sql/snowflake_variant.sql after olap_warehouse.sql.",
-        details: error.message
-      });
+      return apiError(
+        res,
+        500,
+        "Failed to load schema comparison. Run database/sql/snowflake_variant.sql after olap_warehouse.sql.",
+        error.message
+      );
     }
 
     serverError(res, "Failed to load schema comparison", error);

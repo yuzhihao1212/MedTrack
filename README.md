@@ -305,7 +305,7 @@ All successful API responses use `{ "success": true, "data": ... }`; errors use 
 
 The retained source dataset contains 4,149 unique device records across 13 original columns, with purchase dates from 2013-04-13 to 2024-04-11. The project profile found no missing source values and identified 105 negative maintenance-cost values; the cleaned file keeps the raw amount for traceability and leaves the cleaned amount blank for those anomalies. Device type, manufacturer, country and maintenance-report distributions are recorded in [docs/dataset_summary.md](docs/dataset_summary.md).
 
-The course materials identified the source file as `Medical_Device_Failure_dataset(1).csv`; no external publisher, author or source URL is recorded in the repository. The copy is retained as [database/raw/medical_device_failure.csv](database/raw/medical_device_failure.csv). Add the original publisher and URL here if they become available rather than guessing the attribution.
+The source is the [Medical Device Failure Dataset (Anonymized)](https://www.kaggle.com/datasets/antoinepierreno/medical-device-failure-dataset-anonymized) published on Kaggle by A. Pierreno. The downloaded copy is retained as [database/raw/medical_device_failure.csv](database/raw/medical_device_failure.csv).
 
 ## What I learned and design decisions
 
@@ -336,7 +336,14 @@ The course materials identified the source file as `Medical_Device_Failure_datas
 
 MedTrack began as a team project for the INF2003 database course (Group 23) and is being prepared here as a portfolio example of relational, document and analytical database design.
 
-Contributors: _replace this line with names and GitHub profile links_.
+Contributors:
+
+- Yu ZhiHao ([@yuzhihao1212](https://github.com/yuzhihao1212))
+- Koh Wei Lun Kendrick ([@kthgoat](https://github.com/kthgoat))
+- Nyi Khant Moe ([@mmmmm0e](https://github.com/mmmmm0e))
+- Kareem Mohamed Arif ([@arifkareem](https://github.com/arifkareem))
+- Isaac Lim Yee Shao ([@izaclimys-ux](https://github.com/izaclimys-ux))
+- Darius Kan Teng Onn ([@Dkkan-dev](https://github.com/Dkkan-dev))
 
 ## License
 

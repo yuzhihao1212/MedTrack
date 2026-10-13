@@ -4,12 +4,6 @@
 
 MedTrack is a project for tracking medical devices, failure reports, maintenance work, parts and operational logs. It addresses the split nature of hospital equipment data: structured records that need relational integrity live in MySQL, while variable event, sensor, note, alert and audit documents live in MongoDB. A Node.js/Express API and browser-based frontend bring both stores together for operational dashboards and analytical reporting.
 
-## Demo video
-
-[![Watch the MedTrack demo video on YouTube](https://img.youtube.com/vi/MwwB7gF7W9Y/maxresdefault.jpg)](https://youtu.be/MwwB7gF7W9Y)
-
-[Watch the demo on YouTube](https://youtu.be/MwwB7gF7W9Y) for a walkthrough of the running application.
-
 ## Highlights
 
 - **Hybrid persistence:** [the relational schema](database/sql/schema.sql) stores devices, manufacturers, types, failures, maintenance, technicians, parts and users with keys and constraints; [the MongoDB collection design](database/nosql/collections.md) stores documents whose metadata or sensor readings vary by event and device type.

@@ -337,9 +337,9 @@ MedTrack began as a team project for the INF2003 database course (Group 23) and 
 
 Contributors:
 
-- Yu ZhiHao ([@yuzhihao1212](https://github.com/yuzhihao1212))
-- Koh Wei Lun Kendrick ([@kthgoat](https://github.com/kthgoat))
-- Nyi Khant Moe ([@mmmmm0e](https://github.com/mmmmm0e))
-- Kareem Mohamed Arif ([@arifkareem](https://github.com/arifkareem))
-- Isaac Lim Yee Shao ([@izaclimys-ux](https://github.com/izaclimys-ux))
-- Darius Kan Teng Onn ([@Dkkan-dev](https://github.com/Dkkan-dev))
+- [@yuzhihao1212](https://github.com/yuzhihao1212)
+- [@kthgoat](https://github.com/kthgoat)
+- [@mmmmm0e](https://github.com/mmmmm0e)
+- [@arifkareem](https://github.com/arifkareem)
+- [@izaclimys-ux](https://github.com/izaclimys-ux)
+- [@Dkkan-dev](https://github.com/Dkkan-dev)

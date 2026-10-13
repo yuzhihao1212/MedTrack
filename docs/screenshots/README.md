@@ -1,6 +1,6 @@
 # Screenshot capture checklist
 
-Capture the application only after MySQL and MongoDB have been initialised with the repository scripts. Use a consistent desktop viewport, avoid browser chrome where possible, and do not include local credentials or tokens.
+These captures use a consistent 1098 × 720 browser viewport after MySQL and MongoDB were initialised with the repository scripts. They show the top of each page without browser chrome, credentials, or tokens.
 
 Included files:
 

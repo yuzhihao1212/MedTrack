@@ -109,9 +109,11 @@ MongoDB documents refer to the relational device record through `device_code`; t
 
 These screenshots were captured from the running application with the repository's seeded local data. The full set and recapture notes are in [docs/screenshots/](docs/screenshots/README.md).
 
-| Login | Operational dashboard |
+![MedTrack operational dashboard](docs/screenshots/dashboard.jpg)
+
+| Login | Role-aware home |
 | --- | --- |
-| ![MedTrack login](docs/screenshots/login.jpg) | ![MedTrack operational dashboard](docs/screenshots/dashboard.jpg) |
+| ![MedTrack login](docs/screenshots/login.jpg) | ![MedTrack home](docs/screenshots/home.jpg) |
 
 | Device inventory | Failure reports |
 | --- | --- |
